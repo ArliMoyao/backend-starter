@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Authing, Friending, Posting, Sessioning } from "./app";
+import { tagMoodSync, Authing, Friending, Posting, Sessioning, inviting } from "./app";
 import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
 import Responses from "./responses";
@@ -13,6 +13,63 @@ import { z } from "zod";
  * Web server routes for the app. Implements synchronizations between concepts.
  */
 class Routes {
+  
+  //my concepts
+
+  //concept tagMoodSynch
+  //using the put method to select tag an event
+  @Router.put("/events/:id/tag")
+  async tagEvent(eventId: string, tagId: string) {
+    return await tagMoodSync.tagEvent(new ObjectId(eventId), new ObjectId(tagId));
+  }
+
+  //concept inviting 
+  //using the post method to accept an invitation
+  @Router.post("/invitations/:id/accept")
+  async acceptInvitation(session: SessionDoc, id: string) {
+    const user = Sessioning.getUser(session);
+    return await inviting.acceptInvitation(user, new ObjectId(id));
+  }
+
+  
+ 
+  //concept notifying 
+  //using the post method to send a notification
+  //@Router.post("/notifications")
+
+
+  //concept events 
+  //using the get method to get all events
+  //@Router.get("/events")
+  //using the post method to create an event
+  //@Router.post("/events")
+  //using the patch method to update an event
+  //@Router.patch("/events/:id")
+  //using the delete method to delete an event
+  //@Router.delete("/events/:id")
+
+  
+
+  //concept streakBadgeRewarding 
+  //using the post method to reward a user
+  //@Router.post("/rewards")
+  //using the post method to create a badge
+  //@Router.post("/badges")
+  //using the post method to create a streak
+  //@Router.post("/streaks")
+  //using get to check if a user has a streak
+  //@Router.get("/streaks/:id")
+  //using the patch method to update a streak
+  //@Router.patch("/streaks/:id")
+
+
+
+  
+
+
+  
+  
+  
   // Synchronize the concepts from `app.ts`.
 
   @Router.get("/session")
