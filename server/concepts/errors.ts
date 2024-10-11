@@ -31,3 +31,11 @@ export class NotAllowedError extends FormattableError {
 export class NotFoundError extends FormattableError {
   public readonly HTTP_CODE = 404;
 }
+
+/**
+ * Corresponds to an action that attempts to access an event when it is full at capacity 
+ *
+ */
+export class CapacityError extends FormattableError {
+  public readonly HTTP_CODE = 403;
+}
