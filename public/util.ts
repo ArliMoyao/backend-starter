@@ -1,5 +1,5 @@
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-type InputTag = "input" | "textarea" | "json";
+type InputTag = "input" | "textarea" | "json" | "number" | "boolean";
 type Field = InputTag | { [key: string]: Field };
 type Fields = Record<string, Field>;
 
@@ -57,29 +57,133 @@ const operations: Operation[] = [
     fields: { username: "input" },
   },
   {
-    name: "Get Posts (empty for all)",
-    endpoint: "/api/posts",
+    name: "Get Events",
+    endpoint: "/api/events",
     method: "GET",
-    fields: { author: "input" },
+    fields: {},
   },
   {
-    name: "Create Post",
-    endpoint: "/api/posts",
+    name: "Get Event Details",
+    endpoint: "/api/events/:id",
+    method: "GET",
+    fields: { id: "input" },
+  },
+  {
+    name: "Create Event",
+    endpoint: "/api/events",
     method: "POST",
-    fields: { content: "input" },
+    fields: { location: "input", eventType: "input", capacity: "number" },
   },
   {
-    name: "Update Post",
-    endpoint: "/api/posts/:id",
-    method: "PATCH",
-    fields: { id: "input", content: "input", options: { backgroundColor: "input" } },
+    name: "Update Event",
+    endpoint: "/api/events/:id",
+    method: "PUT",
+    fields: { id: "input", location: "input", eventType: "input", capacity: "number" },
   },
   {
-    name: "Delete Post",
-    endpoint: "/api/posts/:id",
+    name: "Delete Event",
+    endpoint: "/api/events/:id",
     method: "DELETE",
     fields: { id: "input" },
   },
+  {
+    name: "RSVP to Event",
+    endpoint: "/api/events/:id/rsvp",
+    method: "POST",
+    fields: { id: "input" },
+  },
+  {
+    name: "Cancel RSVP",
+    endpoint: "/api/events/:id/rsvp",
+    method: "DELETE",
+    fields: { id: "input" },
+  },
+  {
+    name: "Get RSVPs",
+    endpoint: "/api/rsvps",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Get Specific RSVP Details",
+    endpoint: "/api/rsvps/:id",
+    method: "GET",
+    fields: { id: "input" },
+  },
+  {
+    name: "Get Streaks",
+    endpoint: "/api/streaks/:userid",
+    method: "GET",
+    fields: { userid: "input" },
+  },
+  {
+    name: "Increment Streak",
+    endpoint: "/api/streaks/increment",
+    method: "PATCH",
+    fields: {},
+  },
+  {
+    name: "Mark Attendance",
+    endpoint: "/api/events/:eventid/attendance",
+    method: "PATCH",
+    fields: { eventid: "input", userId: "input", attendence: "boolean" },
+  },
+  {
+    name: "Get Upvotes for Event",
+    endpoint: "/api/upvotes/:eventid",
+    method: "GET",
+    fields: { eventid: "input" },
+  },
+  {
+    name: "Upvote Event",
+    endpoint: "/api/upvotes/:eventid",
+    method: "POST",
+    fields: { eventid: "input" },
+  },
+  {
+    name: "Remove Upvote from Event",
+    endpoint: "/api/upvotes/:eventid",
+    method: "DELETE",
+    fields: { eventid: "input" },
+  },
+  {
+    name: "Tag Event",
+    endpoint: "/api/events/:eventId/tags",
+    method: "POST",
+    fields: { eventId: "input", tag: "input" },
+  },
+  {
+    name: "Remove Tag from Event",
+    endpoint: "/api/events/:eventId/tags",
+    method: "DELETE",
+    fields: { eventId: "input", tagId: "input" },
+  },
+  {
+    name: "Set Mood for User",
+    endpoint: "/api/users/mood",
+    method: "POST",
+    fields: { moodId: "input" },
+  },
+  {
+    name: "Get Available Moods",
+    endpoint: "/api/mood",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Get Events by Mood",
+    endpoint: "/api/users/events-by-mood",
+    method: "GET",
+    fields: {},
+  },
+  {
+    name: "Get Events by Category",
+    endpoint: "/api/events/by-category",
+    method: "GET",
+    fields: { tagId: "input" },
+  },
+
+
   //
   // ...
   //
