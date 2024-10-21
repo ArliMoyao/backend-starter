@@ -68,6 +68,10 @@ export default class EventsConcept {
     };
   }
 
+  async getEvents() {
+    const events = await this.events.readMany({});
+    return events;
+  }
   //If user is the host of the given event, they can mark attendance when user attends 
   
   async markPartipantsAttendance(user: ObjectId, eventId: ObjectId, userId:ObjectId, eventDate: Date) {

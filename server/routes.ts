@@ -24,10 +24,11 @@ class Routes {
 
 //routes for Events Concept
 
-//fetch all events
+//fetch all events\
 @Router.get("/events")
 async getEvents() {
-  return Eventing.events;
+  const events = await Eventing.getEvents();
+  return { events };
 }
 
 
@@ -288,6 +289,7 @@ async removeUpvote(session: SessionDoc, event: string) {
     }
     return Responses.posts(posts);
   }
+
 
 
     // Create a post associated with an action (RSVP, upvote, etc.) and optionally generate a notification
