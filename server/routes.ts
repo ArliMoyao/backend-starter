@@ -20,8 +20,6 @@ class Routes {
 
 //increment a user's streak if they attend an event which is part of host controls or reset the streak if a user has not been marked for attendance for an event 
 
-
-
 @Router.post("/events")
 @Router.validate(z.object({
   title: z.string().min(1),

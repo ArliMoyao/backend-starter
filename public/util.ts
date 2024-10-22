@@ -1,5 +1,5 @@
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-type InputTag = "input" | "textarea" | "json" | "number" | "boolean";
+type InputTag = "input" | "textarea" | "json" | "number" | "boolean" | "datetime-local";
 type Field = InputTag | { [key: string]: Field };
 type Fields = Record<string, Field>;
 
@@ -72,7 +72,15 @@ const operations: Operation[] = [
     name: "Create Event",
     endpoint: "/api/events",
     method: "POST",
-    fields: { location: "input", eventType: "input", capacity: "number" },
+    fields: {
+      title: "input",
+      description: "input",
+      category: "input",
+      moodTags: "input", // Comma-separated list of mood tags
+      capacity: "number",
+      location: "input",
+      date: "datetime-local"
+    },
   },
   {
     name: "Update Event",
