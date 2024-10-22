@@ -14,8 +14,14 @@ import { EventDoc } from "./concepts/events";
  * Web server routes for the app. Implements synchronizations between concepts.
  */
 class Routes {
+ 
+  private tagging: typeof Tagging;
+  private eventing: typeof Eventing;
 
-
+  constructor(tagging: typeof Tagging, eventing: typeof Eventing) {
+    this.tagging = tagging;
+    this.eventing = eventing;
+  }
 
 
 //increment a user's streak if they attend an event which is part of host controls or reset the streak if a user has not been marked for attendance for an event 
@@ -32,15 +38,36 @@ class Routes {
     message: "Invalid date format"
   })
 }))
+
+
+
 async createEvent(session: SessionDoc, title: string, description: string, category: string, moodTags: string[], capacity: number, location: string, date: string) {
   const user = Sessioning.getUser(session);
-  const moodTagsCollection = moodTags.map(tag => new ObjectId(tag));
+
+  // Fetch the available mood tags and categories
+  const availableMoods = await this.tagging.getAvailableMoods();
+  const availableCategories = await this.tagging.getAvailableCategories();
+
+  // Validate the provided mood tags and category
+  const moodTagsArray = moodTags.map(tag => {
+    const mood = availableMoods.find(m => m.id.equals(new ObjectId(tag)));
+    if (!mood) {
+      throw new Error(`Invalid mood tag: ${tag}`);
+    }
+    return new ObjectId(tag);
+  });
+
+  const categoryObject = availableCategories.find(c => c.id.equals(new ObjectId(category)));
+  if (!categoryObject) {
+    throw new Error(`Invalid category: ${category}`);
+  }
+  const categoryObjectId = new ObjectId(category);
+
   const eventDate = new Date(date);
 
-  const result = await Eventing.createEvent(user, title, description, category, moodTagsCollection, capacity, location, eventDate);
+  const result = await this.eventing.createEvent(user, title, description, categoryObjectId, moodTagsArray, capacity, location, eventDate);
   return result;
 }
-
 //routes for Events Concept
 
 //fetch all events\
@@ -67,7 +94,7 @@ async getEvent(id: string) {
 @Router.patch("/events/:id")
 async updateEvent(session: SessionDoc, id: string, location?: string, eventType?: string, capacity?: number) {
   const user = Sessioning.getUser(session);
-  return await Eventing.updateEventDetails(user, new ObjectId(id), { location, eventType, capacity });
+  return await Eventing.updateEventDetails(user, new ObjectId(id), { location, capacity });
 }
 
 
@@ -139,7 +166,7 @@ async getRSVPs() {
   
       const rsvp = await RSVPing.cancelRSVP(user, new ObjectId(id));
       event.capacity +=1; 
-      await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, eventType: event.category, capacity: event.capacity });
+      await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: event.capacity });
       await Posting.createActionPost(user, new ObjectId(id), "cancelRsvp");
       return { msg: rsvp.msg}
   }
@@ -176,7 +203,7 @@ async incrementStreak(session: SessionDoc) {
 @Router.patch("/events/:eventid/attendance")
 
 async markAttendance(session: SessionDoc, eventId: string, userId: string, attended: boolean){
-  await Sessioning.getUser(session);
+  Sessioning.getUser(session);
   const streak = await Streaks.getStreak(new ObjectId(userId));
  
   if (attended){
@@ -307,7 +334,7 @@ async removeUpvote(session: SessionDoc, event: string) {
     // Create a post associated with an action (RSVP, upvote, etc.) and optionally generate a notification
     @Router.post("/posts/action")
     @Router.validate(z.object({ content: z.string(), eventId: z.string().optional(), action: z.string() }))
-    async createActionPost(session: SessionDoc, content: string, action: "rsvp" | "cancelRsvp" | "createEvent" | "deleteEvent" | "streak" | "upvote", eventId?: string) {
+    async createActionPost(session: SessionDoc, action: "rsvp" | "cancelRsvp" | "createEvent" | "deleteEvent" | "streak" | "upvote", eventId?: string) {
       const user = Sessioning.getUser(session);
       const eventObjectId = eventId ? new ObjectId(eventId) : undefined;
       const created = await Posting.createActionPost(user, eventObjectId || new ObjectId(), action);
@@ -337,28 +364,34 @@ async removeUpvote(session: SessionDoc, event: string) {
 
   //tagging concept 
 
-  //tag an event with a category
-  @Router.post("/events/:eventId/tags")
-  @Router.validate(z.object({ tag: z.string() }))
-  async tagEvent(session: SessionDoc, eventId: string, tag: string) {
-      const user = Sessioning.getUser(session);
-      const eventObjectId = new ObjectId(eventId);
-      const tagObjectId = new ObjectId(tag);
-      await Tagging.tagEvent(user, eventObjectId, tagObjectId);
-      return { msg: "Tag successfully added to the event." };
-  }
+// Tag an event with a category
+@Router.post("/events/:eventId/tags")
+@Router.validate(z.object({ tag: z.string() })) // Ensure that tag is provided as a string
+async tagEvent(session: SessionDoc, eventId: string, tag: string) {
+    const user = Sessioning.getUser(session); // Fetch user from session
+    const eventObjectId = new ObjectId(eventId); // Convert eventId to ObjectId
+    const tagObjectId = new ObjectId(tag); // Convert tag (category) to ObjectId
+
+    // Call Tagging method to add the category tag to the event
+    await Tagging.tagEvent(eventObjectId, tagObjectId);
+
+    return { msg: "Tag successfully added to the event." };
+}
 
 
-  //remove a tag from an event
-  @Router.delete("/events/:eventId/tags")
-  @Router.validate(z.object({ tagId: z.string() }))
-  async removeTagFromEvent(session: SessionDoc, eventId: string, tagId: string) {
-    const user = Sessioning.getUser(session);
-    const eventObjectId = new ObjectId(eventId);
-    const tagObjectId = new ObjectId(tagId);
-    await Tagging.removeTagFromEvent(user, eventObjectId, tagObjectId);
+// Remove a tag from an event
+@Router.delete("/events/:eventId/tags")
+@Router.validate(z.object({ tagId: z.string() })) // Validate the tagId as a string
+async removeTagFromEvent(session: SessionDoc, eventId: string, tagId: string) {
+    const user = Sessioning.getUser(session); // Fetch user from session
+    const eventObjectId = new ObjectId(eventId); // Convert eventId to ObjectId
+    const tagObjectId = new ObjectId(tagId); // Convert tagId to ObjectId
+
+    // Call Tagging method to remove the tag from the event
+    await Tagging.removeTagFromEvent(eventObjectId);
+
     return { msg: "Tag successfully removed from the event." };
-  }
+}
 
 
     //set the mood for user 
@@ -446,7 +479,8 @@ async removeUpvote(session: SessionDoc, event: string) {
 
 
 /** The web app. */
-export const app = new Routes();
+
+export const app = new Routes(Tagging, Eventing);
 
 /** The Express router. */
 export const appRouter = getExpressRouter(app);

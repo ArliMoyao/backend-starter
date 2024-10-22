@@ -75,8 +75,8 @@ const operations: Operation[] = [
     fields: {
       title: "input",
       description: "input",
-      category: "input",
-      moodTags: "input", // Comma-separated list of mood tags
+      category: "input", // ObjectId
+      moodTag: "input", // ObjectId
       capacity: "number",
       location: "input",
       date: "datetime-local"
@@ -190,11 +190,6 @@ const operations: Operation[] = [
     method: "GET",
     fields: { tagId: "input" },
   },
-
-
-  //
-  // ...
-  //
 ];
 
 /*

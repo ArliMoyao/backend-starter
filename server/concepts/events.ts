@@ -7,10 +7,11 @@
   export interface EventDoc extends BaseDoc {
     host: ObjectId;
     location: string;
-    eventType: string;
+    title: string;
+    description: string;
     capacity: number;
-    moodTags: Collection<ObjectId>;
-    category: string;
+    moodTag: ObjectId[];
+    category: ObjectId;
     date: Date;
     attendees: ObjectId[];
     status: "upcoming" | "ongoing" | "completed" | "canceled";
@@ -31,14 +32,14 @@
     }
   
     // Action: Create an event
-    async createEvent(user: ObjectId, title: string, description: string, category: string, moodTags:ObjectId[], capacity: number, location: string, date: Date) {
+    async createEvent(user: ObjectId, title: string, description: string, category: ObjectId, moodTag:ObjectId[], capacity: number, location: string, date: Date) {
       // Create the event document
       const newEvent = {
         userId: user,
         title: title,
         description: description,
         category: category,
-        moodTags: moodTags,
+        moodTag: moodTag,
         capacity: capacity,
         location: location,
         date: date,
@@ -66,7 +67,7 @@
       location: event.location,
       category: event.category,
       date: event.date,
-      moodTag: event.moodTags,
+      moodTag: event.moodTag,
       capacity: event.capacity,
       count: event.attendees.length,
       status: event.status,
@@ -79,7 +80,7 @@
   }
   //If user is the host of the given event, they can mark attendance when user attends 
   
-  async markPartipantsAttendance(user: ObjectId, eventId: ObjectId, userId:ObjectId, eventDate: Date) {
+  async markPartipantsAttendance(user: ObjectId, eventId: ObjectId, userId:ObjectId) {
   
     const event = await this.events.readOne({ _id: eventId });
     if (!event) {
