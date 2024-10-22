@@ -1,55 +1,58 @@
 
-import { ObjectId } from "mongodb";
-import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotAllowedError, NotFoundError } from "./errors";
-
-// Interface for representing an Event document
-export interface EventDoc extends BaseDoc {
-  host: ObjectId;
-  location: string;
-  eventType: string;
-  capacity: number;
-  attendees: ObjectId[];
-  status: "upcoming" | "ongoing" | "completed" | "canceled";
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Concept: Events [User, Event, Location, EventType]
-export default class EventsConcept {
-  public readonly events: DocCollection<EventDoc>;
-
-  /**
-   * Make an instance of EventsConcept.
-   */
-  constructor(collectionName: string) {
-    this.events = new DocCollection<EventDoc>(collectionName);
+  import { ObjectId, Db, Collection } from "mongodb";
+  import DocCollection, { BaseDoc } from "../framework/doc";
+  import { NotAllowedError, NotFoundError } from "./errors";
+  
+  // Interface for representing an Event document
+  export interface EventDoc extends BaseDoc {
+    host: ObjectId;
+    location: string;
+    eventType: string;
+    capacity: number;
+    moodTags: Collection<ObjectId>;
+    category: string;
+    date: Date;
+    attendees: ObjectId[];
+    status: "upcoming" | "ongoing" | "completed" | "canceled";
   }
-
-  // Action: Create an event
-  async createEvent(
-    host: ObjectId,
-    location: string,
-    eventType: string,
-    capacity: number
-  ) {
-    const newEvent: EventDoc = {
-      _id: new ObjectId(),
-      host,
-      location,
-      eventType,
-      capacity,
-      attendees: [],
-      status: "upcoming",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      dateCreated: new Date(),
-      dateUpdated: new Date(),
-    };
-
-    await this.events.createOne(newEvent);
-    return { msg: "Event created successfully!", event: newEvent };
-  }
+  
+  // Concept: Events [User, Event, Location, EventType]
+  export default class EventsConcept {
+    public readonly events: DocCollection<EventDoc>;
+  
+    /**
+     * Make an instance of EventsConcept.
+     */
+    constructor(
+      collectionName: string,
+      private db: Db, // Inject the database instance
+    ) {
+      this.events = new DocCollection<EventDoc>(collectionName);
+    }
+  
+    // Action: Create an event
+    async createEvent(user: ObjectId, title: string, description: string, category: string, moodTags:ObjectId[], capacity: number, location: string, date: Date) {
+      // Create the event document
+      const newEvent = {
+        userId: user,
+        title: title,
+        description: description,
+        category: category,
+        moodTags: moodTags,
+        capacity: capacity,
+        location: location,
+        date: date,
+        status: "upcoming", // Default status for a new event
+      };
+  
+      // Save the event to the database
+      const createdEvent = await this.db.collection("events").insertOne(newEvent);
+  
+      return {
+        msg: "Event created",
+        event: await this.db.collection("events").findOne({ _id: createdEvent.insertedId }), // Retrieve the inserted document
+      };
+    }
 
   // Action: Lookup event details
   async lookupEventDetails(eventId: ObjectId) {
@@ -59,9 +62,11 @@ export default class EventsConcept {
     }
 
     return {
-      location: event.location,
-      eventType: event.eventType,
       host: event.host,
+      location: event.location,
+      category: event.category,
+      date: event.date,
+      moodTag: event.moodTags,
       capacity: event.capacity,
       count: event.attendees.length,
       status: event.status,
@@ -98,13 +103,7 @@ export default class EventsConcept {
 }
 
   //Update event details given the user is the host of an event 
-  async updateEventDetails(
-    user: ObjectId,
-    eventId: ObjectId,
-    location?: string,
-    eventType?: string,
-    capacity?: number
-  ) {
+  async updateEventDetails(user: ObjectId, eventId: ObjectId, updates: Partial<Omit<EventDoc, "_id" | "host" | "attendees" | "status">>) {
     const event = await this.events.readOne({ _id: eventId });
     if (!event) {
       throw new NotFoundError(`Event ${eventId} does not exist!`);
@@ -115,20 +114,12 @@ export default class EventsConcept {
       throw new NotAllowedError("You are not the host of this event.");
     }
 
-    const updates: Partial<EventDoc> = {};
-    if (location) updates.location = location;
-    if (eventType) updates.eventType = eventType;
-    if (capacity) {
-      if (event.attendees.length > capacity) {
-        // Remove extra users if the new capacity is less than the current attendees count
-        event.attendees = event.attendees.slice(0, capacity);
-      }
-      updates.capacity = capacity;
-    }
-
+    // Update the event details
     await this.events.partialUpdateOne({ _id: eventId }, updates);
     return { msg: "Event details updated successfully!" };
   }
+  
+
 
   // Action: Cancel an event
   async cancelEvent(user: ObjectId, eventId: ObjectId) {

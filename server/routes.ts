@@ -7,6 +7,7 @@ import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
 import Responses from "./responses";
 import { date, string, z } from "zod";
+import { Collection } from "mongodb";
 import { EventDoc } from "./concepts/events";
 
 /**
@@ -21,6 +22,26 @@ class Routes {
 
 
 
+@Router.post("/events")
+@Router.validate(z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
+  category: z.string().min(1),
+  moodTags: z.array(z.string()).min(1),
+  capacity: z.number().min(1),
+  location: z.string().min(1),
+  date: z.string().refine(val => !isNaN(Date.parse(val)), {
+    message: "Invalid date format"
+  })
+}))
+async createEvent(session: SessionDoc, title: string, description: string, category: string, moodTags: string[], capacity: number, location: string, date: string) {
+  const user = Sessioning.getUser(session);
+  const moodTagsCollection = moodTags.map(tag => new ObjectId(tag));
+  const eventDate = new Date(date);
+
+  const result = await Eventing.createEvent(user, title, description, category, moodTagsCollection, capacity, location, eventDate);
+  return result;
+}
 
 //routes for Events Concept
 
@@ -28,6 +49,7 @@ class Routes {
 @Router.get("/events")
 async getEvents() {
   const events = await Eventing.getEvents();
+
   return { events };
 }
 
@@ -40,27 +62,19 @@ async getEvent(id: string) {
   return Eventing.lookupEventDetails(new ObjectId(id));
 }
 
-//create a new event and sync 
-@Router.post("/events")
-async createEvent(session: SessionDoc, location: string, eventType: string, capacity: number) {
-  const user = Sessioning.getUser(session);
-  const created = await Eventing.createEvent(user, location, eventType, capacity);
-  await Posting.createActionPost(user, created.event._id, "createEvent");
-
-  return { msg: created.msg, event: created.event };
-}
 
 
-//update event details of a specific event
-@Router.put("/events/:id")
+
+//edit event details of a specific event
+@Router.patch("/events/:id")
 async updateEvent(session: SessionDoc, id: string, location?: string, eventType?: string, capacity?: number) {
   const user = Sessioning.getUser(session);
-  return await Eventing.updateEventDetails(user, new ObjectId(id), location, eventType, capacity);
+  return await Eventing.updateEventDetails(user, new ObjectId(id), { location, eventType, capacity });
 }
 
 
 //delete a specific event
-@Router.delete("/events/:id")
+@Router.delete("/events/:id/cancel")
 async deleteEvent(session: SessionDoc, id: string) {
   const user = Sessioning.getUser(session);
   await Posting.createActionPost(user, new ObjectId(id), "deleteEvent");
@@ -102,8 +116,8 @@ async getRSVPs() {
     }
   
       const rsvp = await RSVPing.rsvpForEvent(user, new ObjectId(id));
-      event.capacity -=1; 
-      await Eventing.updateEventDetails(user, new ObjectId(id), event.location, event.eventType, event.capacity);
+      const updatedCapacity = event.capacity - 1;
+      await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: updatedCapacity });
       await Posting.createActionPost(user, new ObjectId(id), "rsvp");
       return { msg: rsvp.msg}
   }
@@ -127,7 +141,7 @@ async getRSVPs() {
   
       const rsvp = await RSVPing.cancelRSVP(user, new ObjectId(id));
       event.capacity +=1; 
-      await Eventing.updateEventDetails(user, new ObjectId(id), event.location, event.eventType, event.capacity);
+      await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, eventType: event.category, capacity: event.capacity });
       await Posting.createActionPost(user, new ObjectId(id), "cancelRsvp");
       return { msg: rsvp.msg}
   }
