@@ -1,91 +1,83 @@
 import { ObjectId } from "mongodb";
 
+import { z } from "zod";
 import { Router, getExpressRouter } from "./framework/router";
 
-import {Tagging, Upvoting, Streaks, RSVPing, Eventing, Authing, Sessioning } from "./app";
+import { Authing, Eventing, Posting, RSVPing, Sessioning, Streaks, Tagging, Upvoting } from "./app";
 //import { PostOptions } from "./concepts/posting";
+import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
 import Responses from "./responses";
-
-import { Collection } from "mongodb";
-import { EventDoc } from "./concepts/events";
 
 /**
  * Web server routes for the app. Implements synchronizations between concepts.
  */
 class Routes {
- 
-@Router.get("/events") //returns an array of all events
-async getEvents() {
-  const events = await Eventing.getEvents();
+  @Router.get("/events") //returns an array of all events
+  async getEvents() {
+    const events = await Eventing.getEvents();
 
-  return { events };
-}
+    return { events };
+  }
 
-// @Router.post("/events")
-// async createEventPost(session: SessionDoc, title: string, description: string, category: string, moodTag: string, capacity: number, location: string, date: Date) {
-//   // const eventDate = new Date(date);
-//   // const user = Sessioning.getUser(session);
-//   // const categoryObjectId = new ObjectId(category);
-//   // const moodTagObjectId = new ObjectId(moodTag);
-  
-//   return await Eventing.createEvent(user, title, description, categoryObjectId, moodTagObjectId, capacity, location, date);
+  // @Router.post("/events")
+  // async createEventPost(session: SessionDoc, title: string, description: string, category: string, moodTag: string, capacity: number, location: string, date: Date) {
+  //   // const eventDate = new Date(date);
+  //   // const user = Sessioning.getUser(session);
+  //   // const categoryObjectId = new ObjectId(category);
+  //   // const moodTagObjectId = new ObjectId(moodTag);
 
-// }
+  //   return await Eventing.createEvent(user, title, description, categoryObjectId, moodTagObjectId, capacity, location, date);
 
+  // }
 
-@Router.post("/events")
-async createEventPost(session: SessionDoc, title: string, description: string, category: string) {
-  // const eventDate = new Date(date);
-  const user = Sessioning.getUser(session);
-  const categoryObjectId = new ObjectId(category);
-  // const moodTagObjectId = new ObjectId(moodTag);
-  
-  return await Eventing.createEvent(user ,title, description, categoryObjectId);
+  @Router.post("/events")
+  async createEventPost(session: SessionDoc, title: string, description: string, category: string) {
+    // const eventDate = new Date(date);
+    const user = Sessioning.getUser(session);
+    const categoryObjectId = new ObjectId(category);
+    // const moodTagObjectId = new ObjectId(moodTag);
 
-}
+    return await Eventing.createEvent(user, title, description, categoryObjectId);
+  }
 
+  @Router.get("/events/:id")
+  async getEvent(id: string) {
+    //this route fetches details of a specific event
+    return Eventing.lookupEventDetails(new ObjectId(id));
+  }
+  //edit event details of a specific event
+  @Router.patch("/events/:id")
+  async updateEvent(session: SessionDoc, id: string, location?: string, eventType?: string, capacity?: number) {
+    const user = Sessioning.getUser(session);
+    return await Eventing.updateEventDetails(user, new ObjectId(id), { location, capacity });
+  }
 
-@Router.get("/events/:id")
-async getEvent(id: string) {
-  //this route fetches details of a specific event
-  return Eventing.lookupEventDetails(new ObjectId(id));
-}
-//edit event details of a specific event
-@Router.patch("/events/:id")
-async updateEvent(session: SessionDoc, id: string, location?: string, eventType?: string, capacity?: number) {
-  const user = Sessioning.getUser(session);
-  return await Eventing.updateEventDetails(user, new ObjectId(id), { location, capacity });
-}
+  //delete a specific event
+  @Router.delete("/events/:id/cancel")
+  async deleteEvent(session: SessionDoc, id: string) {
+    const user = Sessioning.getUser(session);
+    // await Posting.createActionPost(user, new ObjectId(id), "deleteEvent");
 
+    return await Eventing.cancelEvent(user, new ObjectId(id));
+  }
 
-//delete a specific event
-@Router.delete("/events/:id/cancel")
-async deleteEvent(session: SessionDoc, id: string) {
-  const user = Sessioning.getUser(session);
- // await Posting.createActionPost(user, new ObjectId(id), "deleteEvent");
+  //RSVPing concept
 
-  return await Eventing.cancelEvent(user, new ObjectId(id));
-}
+  //list all RSVPs
+  @Router.get("/rsvps")
+  async getRSVPs() {
+    return RSVPing.rsvps;
+  }
 
-//RSVPing concept 
-
-//list all RSVPs
-@Router.get("/rsvps")
-async getRSVPs() {
-  return RSVPing.rsvps;
-}
-
-
-
-//when user rsvp to an event (sync user auth, session, rsvp, event)
-  //step 1: authenticate and validate the user 
-  //step 2: check event capacity is not full 
+  //when user rsvp to an event (sync user auth, session, rsvp, event)
+  //step 1: authenticate and validate the user
+  //step 2: check event capacity is not full
   //step 3: check if user has already rsvp'd to the event
-  //step 4: create a record of an rsvp for the user 
-  //step 4: update the event capacity 
+  //step 4: create a record of an rsvp for the user
+  //step 4: update the event capacity
   //step 5: create a post for the user that they rsvp'd to the event
-    
+
   @Router.post("/events/:id/rsvp")
   async rsvpToEvent(session: SessionDoc, id: string) {
     const user = Sessioning.getUser(session);
@@ -94,21 +86,20 @@ async getRSVPs() {
     if (event.capacity <= rsvpList.length) {
       throw new Error("Event is full");
     }
-    
+
     const hasRSVD = await RSVPing.hasRSVPd(user, new ObjectId(id));
     if (hasRSVD) {
       throw new Error("You have already RSVP'd to this event");
     }
-  
-      const rsvp = await RSVPing.rsvpForEvent(user, new ObjectId(id));
-      const updatedCapacity = event.capacity - 1;
-      await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: updatedCapacity });
-      //await Posting.createActionPost(user, new ObjectId(id), "rsvp");
-      return { msg: rsvp.msg}
+
+    const rsvp = await RSVPing.rsvpForEvent(user, new ObjectId(id));
+    const updatedCapacity = event.capacity - 1;
+    await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: updatedCapacity });
+    //await Posting.createActionPost(user, new ObjectId(id), "rsvp");
+    return { msg: rsvp.msg };
   }
-  
-  
-  //when user cancels their rsvp 
+
+  //when user cancels their rsvp
   @Router.delete("/events/:id/rsvp")
   async cancelRSVP(session: SessionDoc, id: string) {
     const user = Sessioning.getUser(session);
@@ -117,105 +108,94 @@ async getRSVPs() {
     if (event.capacity <= rsvpList.length) {
       throw new Error("Event is full");
     }
-    
+
     const hasRSVD = await RSVPing.hasRSVPd(user, new ObjectId(id));
     if (!hasRSVD) {
       throw new Error("You have not RSVP'd to this event");
     }
-  
-      const rsvp = await RSVPing.cancelRSVP(user, new ObjectId(id));
-      event.capacity +=1; 
-      await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: event.capacity });
-      //await Posting.createActionPost(user, new ObjectId(id), "cancelRsvp");
-      return { msg: rsvp.msg}
+
+    const rsvp = await RSVPing.cancelRSVP(user, new ObjectId(id));
+    event.capacity += 1;
+    await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: event.capacity });
+    //await Posting.createActionPost(user, new ObjectId(id), "cancelRsvp");
+    return { msg: rsvp.msg };
   }
-  
-  
-  
 
+  //get details of a specific rsvp
+  @Router.get("/rsvps/:id")
+  async getRSVP(user: string, event: string) {
+    return RSVPing.getRSVPDetails(new ObjectId(user), new ObjectId(event));
+  }
 
-//get details of a specific rsvp
-@Router.get("/rsvps/:id")
-async getRSVP(user: string, event: string) {
-  return RSVPing.getRSVPDetails(new ObjectId(user), new ObjectId(event));
-}
+  //streaks concept
 
+  //get user's streak details
+  @Router.get("/streaks/:userid")
+  async getStreaks() {
+    return Streaks.streaks;
+  }
 
-//streaks concept 
+  //increment a user's streak
+  @Router.patch("/streaks/increment")
+  async incrementStreak(session: SessionDoc) {
+    const user = Sessioning.getUser(session);
+    return await Streaks.attendEvent(user, new Date());
+  }
 
-//get user's streak details
-@Router.get("/streaks/:userid")
-async getStreaks() {
-  return Streaks.streaks;
-}
+  //mark attendance, increments user streak
+  @Router.patch("/events/:eventid/attendance")
+  async markAttendance(session: SessionDoc, eventId: string, userId: string, attended: boolean) {
+    Sessioning.getUser(session);
+    const streak = await Streaks.getStreak(new ObjectId(userId));
 
-//increment a user's streak
-@Router.patch("/streaks/increment")
-async incrementStreak(session: SessionDoc) {
-  const user = Sessioning.getUser(session);
-  return await Streaks.attendEvent(user, new Date());
-}
+    if (attended) {
+      const eventDate = new Date();
+      const result = await Streaks.attendEvent(new ObjectId(userId), eventDate);
 
+      if (!result) {
+        console.error("Error incrementing streak");
+      }
+      //await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
 
-//mark attendance, increments user streak
-@Router.patch("/events/:eventid/attendance")
+      return { msg: streak };
+    } else {
+      //reset users streak
+      const resetResult = await Streaks.missedEvent(new ObjectId(userId));
 
-async markAttendance(session: SessionDoc, eventId: string, userId: string, attended: boolean){
-  Sessioning.getUser(session);
-  const streak = await Streaks.getStreak(new ObjectId(userId));
- 
-  if (attended){
-    const eventDate = new Date();
-    const result = await Streaks.attendEvent(new ObjectId(userId), eventDate)
-
-    if (!result){
-      console.error("Error incrementing streak")
+      if (!resetResult) {
+        console.error("error resetting streak");
+      }
+      //await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
+      return { msg: streak };
     }
-    //await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
-
-  return { msg: streak}
   }
-  else{ 
-    //reset users streak 
-    const resetResult = await Streaks.missedEvent(new ObjectId(userId));
 
-    if (!resetResult){
-      console.error("error resetting streak")
-    }
-    //await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
-    return { msg: streak}
+  //upvoting concept
+
+  //get the number of upvotes for an event
+  @Router.get("/upvotes/:eventid")
+  async getUpvotes() {
+    return Upvoting.upvotes;
   }
-}
 
+  //upvote and sync notfications
+  @Router.post("/upvotes/:eventid")
+  async upvote(session: SessionDoc, event: string) {
+    const user = Sessioning.getUser(session);
+    //await Posting.createActionPost(user, new ObjectId(event), "upvote");
+    return await Upvoting.upvote(user, new ObjectId(event));
+  }
 
-//upvoting concept
+  //remove an upvote from an event
+  @Router.delete("/upvotes/:eventid")
+  async removeUpvote(session: SessionDoc, event: string) {
+    const user = Sessioning.getUser(session);
+    return await Upvoting.removeUpvote(user, new ObjectId(event));
+  }
 
-//get the number of upvotes for an event
-@Router.get("/upvotes/:eventid")
-async getUpvotes() {
-  return Upvoting.upvotes;
-}
+  //get the number of upvotes for an event
 
-//upvote and sync notfications 
-@Router.post("/upvotes/:eventid")
-async upvote(session: SessionDoc, event: string) {
-  const user = Sessioning.getUser(session);
-  //await Posting.createActionPost(user, new ObjectId(event), "upvote");
-  return await Upvoting.upvote(user, new ObjectId(event));
-}
-
-//remove an upvote from an event 
-@Router.delete("/upvotes/:eventid")
-async removeUpvote(session: SessionDoc, event: string) {
-  const user = Sessioning.getUser(session);
-  return await Upvoting.removeUpvote(user, new ObjectId(event));
-}
-
-
-//get the number of upvotes for an event 
-
-// Synchronize the concepts from `app.ts`.
-
+  // Synchronize the concepts from `app.ts`.
 
   @Router.get("/session")
   async getSessionUser(session: SessionDoc) {
@@ -286,8 +266,6 @@ async removeUpvote(session: SessionDoc, event: string) {
   //   return Responses.posts(posts);
   // }
 
-
-
   //   // Create a post associated with an action (RSVP, upvote, etc.) and optionally generate a notification
   //   @Router.post("/posts/action")
   //   @Router.validate(z.object({ content: z.string(), eventId: z.string().optional(), action: z.string() }))
@@ -297,7 +275,6 @@ async removeUpvote(session: SessionDoc, event: string) {
   //     const created = await Posting.createActionPost(user, eventObjectId || new ObjectId(), action);
   //     return { msg: created.msg, post: await Responses.post(created.post), notification: created.notification };
   //   }
-
 
   //     // Update a post
   //   @Router.patch("/posts/:id")
@@ -309,7 +286,6 @@ async removeUpvote(session: SessionDoc, event: string) {
   //     return await Posting.update(oid, content, options);
   //   }
 
-
   // // Delete a post
   // @Router.delete("/posts/:id")
   // async deletePost(session: SessionDoc, id: string) {
@@ -319,82 +295,75 @@ async removeUpvote(session: SessionDoc, event: string) {
   //   return Posting.delete(oid);
   // }
 
-  //tagging concept 
+  //tagging concept
 
   @Router.get("categories")
-    async getCategories(category: string) {
-      return await Tagging.setCategories();
-    }
+  async getCategories(category: string) {
+    return await Tagging.setCategories();
+  }
 
+  // Tag an event with a category
+  // @Router.post("/events/:eventId/tags")
+  // @Router.validate(z.object({ tag: z.string() })) // Ensure that tag is provided as a string
+  // async tagEvent(session: SessionDoc, eventId: string, tag: string) {
+  //     const user = Sessioning.getUser(session); // Fetch user from session
+  //     const eventObjectId = new ObjectId(eventId); // Convert eventId to ObjectId
+  //     const tagObjectId = new ObjectId(tag); // Convert tag (category) to ObjectId
 
-  
+  //     // Call Tagging method to add the category tag to the event
+  //     await Tagging.tagEvent(eventObjectId, tagObjectId);
 
+  //     return { msg: "Tag successfully added to the event." };
+  // }
 
-// Tag an event with a category
-// @Router.post("/events/:eventId/tags")
-// @Router.validate(z.object({ tag: z.string() })) // Ensure that tag is provided as a string
-// async tagEvent(session: SessionDoc, eventId: string, tag: string) {
-//     const user = Sessioning.getUser(session); // Fetch user from session
-//     const eventObjectId = new ObjectId(eventId); // Convert eventId to ObjectId
-//     const tagObjectId = new ObjectId(tag); // Convert tag (category) to ObjectId
+  // // Remove a tag from an event
+  // @Router.delete("/events/:eventId/tags")
+  // @Router.validate(z.object({ tagId: z.string() })) // Validate the tagId as a string
+  // async removeTagFromEvent(session: SessionDoc, eventId: string, tagId: string) {
+  //     const user = Sessioning.getUser(session); // Fetch user from session
+  //     const eventObjectId = new ObjectId(eventId); // Convert eventId to ObjectId
+  //     const tagObjectId = new ObjectId(tagId); // Convert tagId to ObjectId
 
-//     // Call Tagging method to add the category tag to the event
-//     await Tagging.tagEvent(eventObjectId, tagObjectId);
+  //     // Call Tagging method to remove the tag from the event
+  //     await Tagging.removeTagFromEvent(eventObjectId);
 
-//     return { msg: "Tag successfully added to the event." };
-// }
+  //     return { msg: "Tag successfully removed from the event." };
+  // }
 
+  //     //set the mood for user
+  //     @Router.post("/users/mood")
+  //     @Router.validate(z.object({ moodId: z.string() }))
+  //     async setMood(session: SessionDoc, moodId: string) {
+  //       const user = Sessioning.getUser(session);
+  //       const moodObjectId = new ObjectId(moodId);
+  //       await Tagging.setMood(user, moodObjectId);
+  //       return { msg: "User mood successfully set." };
+  //     }
 
-// // Remove a tag from an event
-// @Router.delete("/events/:eventId/tags")
-// @Router.validate(z.object({ tagId: z.string() })) // Validate the tagId as a string
-// async removeTagFromEvent(session: SessionDoc, eventId: string, tagId: string) {
-//     const user = Sessioning.getUser(session); // Fetch user from session
-//     const eventObjectId = new ObjectId(eventId); // Convert eventId to ObjectId
-//     const tagObjectId = new ObjectId(tagId); // Convert tagId to ObjectId
+  //     //get moods for user
+  //     @Router.get("/mood")
+  //     async getAvailalbeMoods(session: SessionDoc) {
+  //       const user = Sessioning.getUser(session);
+  //       return await Tagging.getAvailableMoods();
+  //     }
 
-//     // Call Tagging method to remove the tag from the event
-//     await Tagging.removeTagFromEvent(eventObjectId);
+  //     //retrieve events based on the current user's mood
+  //     @Router.get("/users/events-by-mood")
+  //     async getEventsByMood(session: SessionDoc) {
+  //       const user = Sessioning.getUser(session);
+  //       const events = await Tagging.lookupEventsByMood(user);
+  //       return { events };
+  //     }
 
-//     return { msg: "Tag successfully removed from the event." };
-// }
-
-
-//     //set the mood for user 
-//     @Router.post("/users/mood")
-//     @Router.validate(z.object({ moodId: z.string() }))
-//     async setMood(session: SessionDoc, moodId: string) {
-//       const user = Sessioning.getUser(session);
-//       const moodObjectId = new ObjectId(moodId);
-//       await Tagging.setMood(user, moodObjectId);
-//       return { msg: "User mood successfully set." };
-//     }
-  
-//     //get moods for user
-//     @Router.get("/mood")
-//     async getAvailalbeMoods(session: SessionDoc) {
-//       const user = Sessioning.getUser(session);
-//       return await Tagging.getAvailableMoods();
-//     }
-
-//     //retrieve events based on the current user's mood 
-//     @Router.get("/users/events-by-mood")
-//     async getEventsByMood(session: SessionDoc) {
-//       const user = Sessioning.getUser(session);
-//       const events = await Tagging.lookupEventsByMood(user);
-//       return { events };
-//     }
-
-
-//     //retrieve events based on a specific tag/category
-//     @Router.get("/events/by-category")
-//     @Router.validate(z.object({ tagId: z.string() }))
-//     async getEventsByCategory(tagId: string) {
-//       const tagObjectId = new ObjectId(tagId);
-//       const events = await Tagging.filterEventsByCategory(tagObjectId);
-//       return { events };
-//   }
-// }
+  //     //retrieve events based on a specific tag/category
+  //     @Router.get("/events/by-category")
+  //     @Router.validate(z.object({ tagId: z.string() }))
+  //     async getEventsByCategory(tagId: string) {
+  //       const tagObjectId = new ObjectId(tagId);
+  //       const events = await Tagging.filterEventsByCategory(tagObjectId);
+  //       return { events };
+  //   }
+  // }
 
   // @Router.get("/friends")
   // async getFriends(session: SessionDoc) {
@@ -442,7 +411,27 @@ async removeUpvote(session: SessionDoc, event: string) {
   //   const fromOid = (await Authing.getUserByUsername(from))._id;
   //   return await Friending.rejectRequest(fromOid, user);
   // }
+
+  @Router.get("/posts")
+  @Router.validate(z.object({ author: z.string().optional() }))
+  async getPosts(author?: string) {
+    let posts;
+    if (author) {
+      const id = (await Authing.getUserByUsername(author))._id;
+      posts = await Posting.getByAuthor(id);
+    } else {
+      posts = await Posting.getPosts();
+    }
+    return Responses.posts(posts);
   }
+
+  @Router.post("/posts")
+  async createPost(session: SessionDoc, content: string, options?: PostOptions) {
+    const user = Sessioning.getUser(session);
+    const created = await Posting.create(user, content, options);
+    return { msg: created.msg, post: await Responses.post(created.post) };
+  }
+}
 
 /** The web app. */
 
@@ -450,4 +439,3 @@ export const app = new Routes();
 
 /** The Express router. */
 export const appRouter = getExpressRouter(app);
-

@@ -7,6 +7,7 @@ import RSVPConcept from "./concepts/rsvp'ing";
 import StreakConcept from "./concepts/streaks";
 import TaggingConcept from "./concepts/tagging";
 import UpvotingConcept from "./concepts/upvoting";
+import PostingConcept from "./concepts/posting";
 
 
 
@@ -20,4 +21,5 @@ export const RSVPing = new RSVPConcept("rsvps");
 export const Streaks = new StreakConcept("streaks");
 export const Tagging = new TaggingConcept("tags", "moods", "events", "users");
 export const Upvoting = new UpvotingConcept("upvotes", "events");
+export const Posting = new PostingConcept("posts");
 //export const Friending = new FriendingConcept("friends");
