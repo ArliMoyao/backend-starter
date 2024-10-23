@@ -22,16 +22,29 @@ async getEvents() {
   return { events };
 }
 
+// @Router.post("/events")
+// async createEventPost(session: SessionDoc, title: string, description: string, category: string, moodTag: string, capacity: number, location: string, date: Date) {
+//   // const eventDate = new Date(date);
+//   // const user = Sessioning.getUser(session);
+//   // const categoryObjectId = new ObjectId(category);
+//   // const moodTagObjectId = new ObjectId(moodTag);
+  
+//   return await Eventing.createEvent(user, title, description, categoryObjectId, moodTagObjectId, capacity, location, date);
+
+// }
+
+
 @Router.post("/events")
-async createEventPost(session: SessionDoc, title: string, description: string, category: string, moodTag: string, capacity: number, location: string, date: Date) {
-  const eventDate = new Date(date);
+async createEventPost(session: SessionDoc, title: string, description: string, category: string) {
+  // const eventDate = new Date(date);
   const user = Sessioning.getUser(session);
   const categoryObjectId = new ObjectId(category);
-  const moodTagObjectId = new ObjectId(moodTag);
+  // const moodTagObjectId = new ObjectId(moodTag);
   
-  return await Eventing.createEvent(user, title, description, categoryObjectId, moodTagObjectId, capacity, location, date);
+  return await Eventing.createEvent(user ,title, description, categoryObjectId);
 
 }
+
 
 @Router.get("/events/:id")
 async getEvent(id: string) {

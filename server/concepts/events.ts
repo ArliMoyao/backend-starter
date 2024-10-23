@@ -29,19 +29,41 @@
     constructor(collectionName: string) {
       this.events = new DocCollection<EventDoc>(collectionName);
     }
+    // // Action: Create an event
+    // async createEvent(user: ObjectId, title: string, description: string, category: ObjectId, moodTag:ObjectId, capacity: number, location: string, date: Date) {
+    //   // Create the event document
+    //   const newEvent = {
+    //     userId: user,
+    //     title: title,
+    //     description: description,
+    //     // category: category,
+    //     // moodTag: moodTag,
+    //     // capacity: capacity,
+    //     // location: location,
+    //     // date: date,
+    //     // status: "upcoming", // Default status for a new event
+    //   };
+  
+   
+    //   return {
+    //     msg: "Event created",
+    //   }
+    // }
+
+
     // Action: Create an event
-    async createEvent(user: ObjectId, title: string, description: string, category: ObjectId, moodTag:ObjectId, capacity: number, location: string, date: Date) {
+    async createEvent(user: ObjectId, title: string, description: string, category: ObjectId) {
       // Create the event document
       const newEvent = {
         userId: user,
         title: title,
         description: description,
-        category: category,
-        moodTag: moodTag,
-        capacity: capacity,
-        location: location,
-        date: date,
-        status: "upcoming", // Default status for a new event
+        // category: category,
+        // moodTag: moodTag,
+        // capacity: capacity,
+        // location: location,
+        // date: date,
+        // status: "upcoming", // Default status for a new event
       };
   
    
@@ -49,7 +71,6 @@
         msg: "Event created",
       }
     }
-
   // Action: Lookup event details
   async lookupEventDetails(eventId: ObjectId) {
     const event = await this.events.readOne({ _id: eventId });
