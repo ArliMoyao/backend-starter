@@ -15,7 +15,6 @@ import UpvotingConcept from "./concepts/upvoting";
 export const Sessioning = new SessioningConcept();
 export const Authing = new AuthenticatingConcept("users");
 //export const Posting = new PostingConcept("posts");
-//import db from "./db";
 export const Eventing = new EventConcept("events");
 export const RSVPing = new RSVPConcept("rsvps");
 export const Streaks = new StreakConcept("streaks");

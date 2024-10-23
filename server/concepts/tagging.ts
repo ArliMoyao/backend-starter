@@ -13,8 +13,8 @@ export interface EventDoc extends BaseDoc {
   location: string;
   eventType: string;
   capacity: number;
-  moodTag: ObjectId | null; // Single ObjectId for mood tag
-  category: ObjectId; // ObjectId for category
+  moodTag: ObjectId;
+  category: ObjectId;
   date: Date;
   status: string;
 }

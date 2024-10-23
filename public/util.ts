@@ -63,12 +63,12 @@ const operations: Operation[] = [
     method: "GET",
     fields: {},
   },
-  {
-    name: "Get Event Details",
-    endpoint: "/api/events/:id",
-    method: "GET",
-    fields: { id: "input" },
-  },
+  // {
+  //   name: "Get Event Details",
+  //   endpoint: "/api/events/:id",
+  //   method: "GET",
+  //   fields: { id: "input" },
+  // },
   {
     name: "Create Event",
     endpoint: "/api/events",
@@ -76,8 +76,8 @@ const operations: Operation[] = [
     fields: {
       title: "input",
       description: "input",
-      category: "input", // ObjectId
-      moodTag: "input", // ObjectId
+      category: "input", 
+      moodTag: "input", 
       capacity: "input",
       location: "input",
       date: "input"
@@ -89,7 +89,7 @@ const operations: Operation[] = [
     name: "Update Event",
     endpoint: "/api/events/:id",
     method: "PUT",
-    fields: { id: "input", location: "input", eventType: "input", capacity: "number" },
+    fields: { id: "input", location: "input", eventType: "input", capacity: "input" },
   },
   {
     name: "Delete Event",

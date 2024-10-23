@@ -3,6 +3,7 @@
   import DocCollection, { BaseDoc } from "../framework/doc";
   import { NotAllowedError, NotFoundError } from "./errors";
   import TaggingConcept from "./tagging";
+
   
   // Interface for representing an Event document
   export interface EventDoc extends BaseDoc {
@@ -11,7 +12,7 @@
     title: string;
     description: string;
     capacity: number;
-    moodTag: ObjectId[];
+    moodTag: ObjectId;
     category: ObjectId;
     date: Date;
     attendees: ObjectId[];
@@ -29,7 +30,7 @@
       this.events = new DocCollection<EventDoc>(collectionName);
     }
     // Action: Create an event
-    async createEvent(user: ObjectId, title: string, description: string, category: ObjectId, moodTag:ObjectId[], capacity: number, location: string, date: Date) {
+    async createEvent(user: ObjectId, title: string, description: string, category: ObjectId, moodTag:ObjectId, capacity: number, location: string, date: Date) {
       // Create the event document
       const newEvent = {
         userId: user,

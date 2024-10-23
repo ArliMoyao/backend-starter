@@ -6,7 +6,7 @@ import {Tagging, Upvoting, Streaks, RSVPing, Eventing, Authing, Sessioning } fro
 //import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
 import Responses from "./responses";
-import { date, string, z } from "zod";
+
 import { Collection } from "mongodb";
 import { EventDoc } from "./concepts/events";
 
@@ -23,40 +23,21 @@ async getEvents() {
 }
 
 @Router.post("/events")
-async createEvent(session: SessionDoc, title: string, description: string, category: string, moodTag: string[], capacity: number, location: string, date: Date) {
-  //fetch the mood tags and categories 
-  const moodTags = await Tagging.setMoods();
-  //user clicks on a mood associated with a specific event
-  const moodTagObjects = moodTag.map((mood) => {
-    const moodObjectId = new ObjectId(mood);
-    return moodObjectId;
-  });
-  const categories = await Tagging.setCategories();
-  //user clicks on category to associate with event
-
-
+async createEventPost(session: SessionDoc, title: string, description: string, category: string, moodTag: string, capacity: number, location: string, date: Date) {
   const eventDate = new Date(date);
-  //check if the user is logged in
-  Sessioning.getUser(session);
-
   const user = Sessioning.getUser(session);
-
   const categoryObjectId = new ObjectId(category);
-
+  const moodTagObjectId = new ObjectId(moodTag);
   
-  return await Eventing.createEvent(user, title, description, categoryObjectId, moodTagObjects, capacity, location, date);
+  return await Eventing.createEvent(user, title, description, categoryObjectId, moodTagObjectId, capacity, location, date);
+
 }
 
 @Router.get("/events/:id")
-@Router.validate(z.object({ id: z.string().min(1) }))
 async getEvent(id: string) {
   //this route fetches details of a specific event
   return Eventing.lookupEventDetails(new ObjectId(id));
 }
-
-
-
-
 //edit event details of a specific event
 @Router.patch("/events/:id")
 async updateEvent(session: SessionDoc, id: string, location?: string, eventType?: string, capacity?: number) {
@@ -93,7 +74,6 @@ async getRSVPs() {
   //step 5: create a post for the user that they rsvp'd to the event
     
   @Router.post("/events/:id/rsvp")
-  @Router.validate(z.object({ id: z.string().min(1) }))
   async rsvpToEvent(session: SessionDoc, id: string) {
     const user = Sessioning.getUser(session);
     const event = await Eventing.lookupEventDetails(new ObjectId(id));
@@ -117,7 +97,6 @@ async getRSVPs() {
   
   //when user cancels their rsvp 
   @Router.delete("/events/:id/rsvp")
-  @Router.validate(z.object({ id: z.string().min(1) }))
   async cancelRSVP(session: SessionDoc, id: string) {
     const user = Sessioning.getUser(session);
     const event = await Eventing.lookupEventDetails(new ObjectId(id));
@@ -144,7 +123,6 @@ async getRSVPs() {
 
 //get details of a specific rsvp
 @Router.get("/rsvps/:id")
-@Router.validate(z.object({ id: z.string().min(1) }))
 async getRSVP(user: string, event: string) {
   return RSVPing.getRSVPDetails(new ObjectId(user), new ObjectId(event));
 }
@@ -238,7 +216,6 @@ async removeUpvote(session: SessionDoc, event: string) {
   }
 
   @Router.get("/users/:username")
-  @Router.validate(z.object({ username: z.string().min(1) }))
   async getUser(username: string) {
     return await Authing.getUserByUsername(username);
   }
@@ -452,7 +429,7 @@ async removeUpvote(session: SessionDoc, event: string) {
   //   const fromOid = (await Authing.getUserByUsername(from))._id;
   //   return await Friending.rejectRequest(fromOid, user);
   // }
-}
+  }
 
 /** The web app. */
 
