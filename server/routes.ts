@@ -15,7 +15,7 @@ import { EventDoc } from "./concepts/events";
  */
 class Routes {
  
-@Router.get("/events")
+@Router.get("/events") //returns an array of all events
 async getEvents() {
   const events = await Eventing.getEvents();
 
@@ -24,9 +24,26 @@ async getEvents() {
 
 @Router.post("/events")
 async createEvent(session: SessionDoc, title: string, description: string, category: string, moodTag: string[], capacity: number, location: string, date: Date) {
+  //fetch the mood tags and categories 
+  const moodTags = await Tagging.setMoods();
+  //user clicks on a mood associated with a specific event
+  const moodTagObjects = moodTag.map((mood) => {
+    const moodObjectId = new ObjectId(mood);
+    return moodObjectId;
+  });
+  const categories = await Tagging.setCategories();
+  //user clicks on category to associate with event
+
+
+  const eventDate = new Date(date);
+  //check if the user is logged in
+  Sessioning.getUser(session);
+
   const user = Sessioning.getUser(session);
+
   const categoryObjectId = new ObjectId(category);
-  const moodTagObjects = moodTag.map((tag) => new ObjectId(tag));
+
+  
   return await Eventing.createEvent(user, title, description, categoryObjectId, moodTagObjects, capacity, location, date);
 }
 
@@ -314,71 +331,80 @@ async removeUpvote(session: SessionDoc, event: string) {
 
   //tagging concept 
 
-// Tag an event with a category
-@Router.post("/events/:eventId/tags")
-@Router.validate(z.object({ tag: z.string() })) // Ensure that tag is provided as a string
-async tagEvent(session: SessionDoc, eventId: string, tag: string) {
-    const user = Sessioning.getUser(session); // Fetch user from session
-    const eventObjectId = new ObjectId(eventId); // Convert eventId to ObjectId
-    const tagObjectId = new ObjectId(tag); // Convert tag (category) to ObjectId
-
-    // Call Tagging method to add the category tag to the event
-    await Tagging.tagEvent(eventObjectId, tagObjectId);
-
-    return { msg: "Tag successfully added to the event." };
-}
-
-
-// Remove a tag from an event
-@Router.delete("/events/:eventId/tags")
-@Router.validate(z.object({ tagId: z.string() })) // Validate the tagId as a string
-async removeTagFromEvent(session: SessionDoc, eventId: string, tagId: string) {
-    const user = Sessioning.getUser(session); // Fetch user from session
-    const eventObjectId = new ObjectId(eventId); // Convert eventId to ObjectId
-    const tagObjectId = new ObjectId(tagId); // Convert tagId to ObjectId
-
-    // Call Tagging method to remove the tag from the event
-    await Tagging.removeTagFromEvent(eventObjectId);
-
-    return { msg: "Tag successfully removed from the event." };
-}
-
-
-    //set the mood for user 
-    @Router.post("/users/mood")
-    @Router.validate(z.object({ moodId: z.string() }))
-    async setMood(session: SessionDoc, moodId: string) {
-      const user = Sessioning.getUser(session);
-      const moodObjectId = new ObjectId(moodId);
-      await Tagging.setMood(user, moodObjectId);
-      return { msg: "User mood successfully set." };
+  @Router.get("categories")
+    async getCategories(category: string) {
+      return await Tagging.getCategories();
     }
+
+
   
-    //get moods for user
-    @Router.get("/mood")
-    async getAvailalbeMoods(session: SessionDoc) {
-      const user = Sessioning.getUser(session);
-      return await Tagging.getAvailableMoods();
-    }
-
-    //retrieve events based on the current user's mood 
-    @Router.get("/users/events-by-mood")
-    async getEventsByMood(session: SessionDoc) {
-      const user = Sessioning.getUser(session);
-      const events = await Tagging.lookupEventsByMood(user);
-      return { events };
-    }
 
 
-    //retrieve events based on a specific tag/category
-    @Router.get("/events/by-category")
-    @Router.validate(z.object({ tagId: z.string() }))
-    async getEventsByCategory(tagId: string) {
-      const tagObjectId = new ObjectId(tagId);
-      const events = await Tagging.filterEventsByCategory(tagObjectId);
-      return { events };
-  }
-}
+// Tag an event with a category
+// @Router.post("/events/:eventId/tags")
+// @Router.validate(z.object({ tag: z.string() })) // Ensure that tag is provided as a string
+// async tagEvent(session: SessionDoc, eventId: string, tag: string) {
+//     const user = Sessioning.getUser(session); // Fetch user from session
+//     const eventObjectId = new ObjectId(eventId); // Convert eventId to ObjectId
+//     const tagObjectId = new ObjectId(tag); // Convert tag (category) to ObjectId
+
+//     // Call Tagging method to add the category tag to the event
+//     await Tagging.tagEvent(eventObjectId, tagObjectId);
+
+//     return { msg: "Tag successfully added to the event." };
+// }
+
+
+// // Remove a tag from an event
+// @Router.delete("/events/:eventId/tags")
+// @Router.validate(z.object({ tagId: z.string() })) // Validate the tagId as a string
+// async removeTagFromEvent(session: SessionDoc, eventId: string, tagId: string) {
+//     const user = Sessioning.getUser(session); // Fetch user from session
+//     const eventObjectId = new ObjectId(eventId); // Convert eventId to ObjectId
+//     const tagObjectId = new ObjectId(tagId); // Convert tagId to ObjectId
+
+//     // Call Tagging method to remove the tag from the event
+//     await Tagging.removeTagFromEvent(eventObjectId);
+
+//     return { msg: "Tag successfully removed from the event." };
+// }
+
+
+//     //set the mood for user 
+//     @Router.post("/users/mood")
+//     @Router.validate(z.object({ moodId: z.string() }))
+//     async setMood(session: SessionDoc, moodId: string) {
+//       const user = Sessioning.getUser(session);
+//       const moodObjectId = new ObjectId(moodId);
+//       await Tagging.setMood(user, moodObjectId);
+//       return { msg: "User mood successfully set." };
+//     }
+  
+//     //get moods for user
+//     @Router.get("/mood")
+//     async getAvailalbeMoods(session: SessionDoc) {
+//       const user = Sessioning.getUser(session);
+//       return await Tagging.getAvailableMoods();
+//     }
+
+//     //retrieve events based on the current user's mood 
+//     @Router.get("/users/events-by-mood")
+//     async getEventsByMood(session: SessionDoc) {
+//       const user = Sessioning.getUser(session);
+//       const events = await Tagging.lookupEventsByMood(user);
+//       return { events };
+//     }
+
+
+//     //retrieve events based on a specific tag/category
+//     @Router.get("/events/by-category")
+//     @Router.validate(z.object({ tagId: z.string() }))
+//     async getEventsByCategory(tagId: string) {
+//       const tagObjectId = new ObjectId(tagId);
+//       const events = await Tagging.filterEventsByCategory(tagObjectId);
+//       return { events };
+//   }
+// }
 
   // @Router.get("/friends")
   // async getFriends(session: SessionDoc) {
@@ -426,7 +452,7 @@ async removeTagFromEvent(session: SessionDoc, eventId: string, tagId: string) {
   //   const fromOid = (await Authing.getUserByUsername(from))._id;
   //   return await Friending.rejectRequest(fromOid, user);
   // }
-
+}
 
 /** The web app. */
 

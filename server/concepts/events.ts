@@ -2,6 +2,7 @@
   import { ObjectId,  Collection } from "mongodb";
   import DocCollection, { BaseDoc } from "../framework/doc";
   import { NotAllowedError, NotFoundError } from "./errors";
+  import TaggingConcept from "./tagging";
   
   // Interface for representing an Event document
   export interface EventDoc extends BaseDoc {
@@ -24,13 +25,9 @@
     /**
      * Make an instance of EventsConcept.
      */
-    constructor(
-      collectionName: string,
-      //private db: Db, // Inject the database instance
-    ) {
+    constructor(collectionName: string) {
       this.events = new DocCollection<EventDoc>(collectionName);
     }
-  
     // Action: Create an event
     async createEvent(user: ObjectId, title: string, description: string, category: ObjectId, moodTag:ObjectId[], capacity: number, location: string, date: Date) {
       // Create the event document

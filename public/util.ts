@@ -1,7 +1,8 @@
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-type InputTag = "input" | "textarea" | "json" | "number" | "boolean" | "datetime-local";
+type InputTag = "input" | "textarea" | "json" | "number" | "boolean" | "datetime-local" | 'select';
 type Field = InputTag | { [key: string]: Field };
 type Fields = Record<string, Field>;
+
 
 type Operation = {
   name: string;
@@ -77,11 +78,13 @@ const operations: Operation[] = [
       description: "input",
       category: "input", // ObjectId
       moodTag: "input", // ObjectId
-      capacity: "number",
+      capacity: "input",
       location: "input",
-      date: "datetime-local"
+      date: "input"
     },
   },
+
+  { name: "Get Categories", endpoint: "/api/categories", method: "GET", fields: {} },
   {
     name: "Update Event",
     endpoint: "/api/events/:id",
