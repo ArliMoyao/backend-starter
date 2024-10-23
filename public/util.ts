@@ -15,6 +15,14 @@ type Operation = {
  * This list of operations is used to generate the manual testing UI.
  */
 const operations: Operation[] = [
+  
+  {
+    name: "Create Post",
+    endpoint: "/api/posts",
+    method: "POST",
+    fields: { content: "input" },
+  },
+  
   {
     name: "Get Session User (logged in user)",
     endpoint: "/api/session",
