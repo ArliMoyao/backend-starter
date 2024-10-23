@@ -333,7 +333,7 @@ async removeUpvote(session: SessionDoc, event: string) {
 
   @Router.get("categories")
     async getCategories(category: string) {
-      return await Tagging.getCategories();
+      return await Tagging.setCategories();
     }
 
 
