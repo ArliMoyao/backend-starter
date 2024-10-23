@@ -16,10 +16,10 @@ class Routes {
 
 
   @Router.post("/events")
-  async createEventPost(session: SessionDoc, title: string, description: string, category: string, date: Date) {
+  async create(session: SessionDoc, title: string, description: string, category: ObjectId, moodTag: ObjectId, capacity: number,  location: string, date: Date) {
     const user = Sessioning.getUser(session);
-    const create = await Posting.create(user, title, description, category, date);
-    return { msg: create.msg, post: await Responses.post(create.post) };
+    const create = await Eventing.create(user, title, description, category, moodTag, capacity, location, date);
+    return { msg: create.msg, event: await Responses.event(create.event) };
   }
 
   // @Router.get("/events/:id")

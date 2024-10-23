@@ -2,6 +2,7 @@ import { Authing } from "./app";
 //import { PostAuthorNotMatchError, PostDoc } from "./concepts/posting";
 import { Router } from "./framework/router";
 import { PostAuthorNotMatchError, PostDoc } from "./concepts/posting";
+import { EventDoc } from "./concepts/events";
 /**
  * This class does useful conversions for the frontend.
  * For example, it converts a {@link PostDoc} into a more readable format for the frontend.
@@ -70,6 +71,15 @@ static async post(post: PostDoc | null) {
   }
   const author = await Authing.getUserById(post.author);
   return { ...post, author: author.username };
+}
+
+
+static async event(event: EventDoc | null) {
+  if (!event) {
+    return event;
+  }
+  const host = await Authing.getUserById(event.host);
+  return { ...event, host: host.username };
 }
 
 /**
