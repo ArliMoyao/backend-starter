@@ -1,5 +1,5 @@
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-type InputTag = "input" | "textarea" | "json" | "number" | "boolean" | "datetime-local" | 'select';
+type InputTag = "input" | "textarea" | "json";
 type Field = InputTag | { [key: string]: Field };
 type Fields = Record<string, Field>;
 
@@ -83,6 +83,16 @@ const operations: Operation[] = [
       date: "input"
     },
   },
+  {
+    name: "Create Event",
+    endpoint: "/api/events",
+    method: "POST",
+    fields: {
+      title: "input",
+      description: "input",
+      category: "input", 
+    },
+  },
 
   { name: "Get Categories", endpoint: "/api/categories", method: "GET", fields: {} },
   {
@@ -133,12 +143,12 @@ const operations: Operation[] = [
     method: "PATCH",
     fields: {},
   },
-  {
-    name: "Mark Attendance",
-    endpoint: "/api/events/:eventid/attendance",
-    method: "PATCH",
-    fields: { eventid: "input", userId: "input", attendence: "boolean" },
-  },
+  // {
+  //   name: "Mark Attendance",
+  //   endpoint: "/api/events/:eventid/attendance",
+  //   method: "PATCH",
+  //   fields: { eventid: "input", userId: "input", attendence: "boolean" },
+  // },
   {
     name: "Get Upvotes for Event",
     endpoint: "/api/upvotes/:eventid",
