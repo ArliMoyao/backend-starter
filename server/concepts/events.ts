@@ -1,5 +1,5 @@
 
-  import { ObjectId, Db, Collection } from "mongodb";
+  import { ObjectId,  Collection } from "mongodb";
   import DocCollection, { BaseDoc } from "../framework/doc";
   import { NotAllowedError, NotFoundError } from "./errors";
   
@@ -26,7 +26,7 @@
      */
     constructor(
       collectionName: string,
-      private db: Db, // Inject the database instance
+      //private db: Db, // Inject the database instance
     ) {
       this.events = new DocCollection<EventDoc>(collectionName);
     }
@@ -46,13 +46,10 @@
         status: "upcoming", // Default status for a new event
       };
   
-      // Save the event to the database
-      const createdEvent = await this.db.collection("events").insertOne(newEvent);
-  
+   
       return {
         msg: "Event created",
-        event: await this.db.collection("events").findOne({ _id: createdEvent.insertedId }), // Retrieve the inserted document
-      };
+      }
     }
 
   // Action: Lookup event details
@@ -80,28 +77,27 @@
   }
   //If user is the host of the given event, they can mark attendance when user attends 
   
-  async markPartipantsAttendance(user: ObjectId, eventId: ObjectId, userId:ObjectId) {
-  
-    const event = await this.events.readOne({ _id: eventId });
-    if (!event) {
-      throw new NotFoundError(`Event ${eventId} does not exist!`);
-    }
+//   async markPartipantsAttendance(user: ObjectId, eventId: ObjectId, userId:ObjectId) {
+//     const event = await this.events.readOne({ _id: eventId });
+//     if (!event) {
+//       throw new NotFoundError(`Event ${eventId} does not exist!`);
+//     }
 
-    // Check if the user is the host of the event
-    if (event.host.toString() !== user.toString()) {
-      throw new NotAllowedError("You are not the host of this event.");
-    }
+//     // Check if the user is the host of the event
+//     if (event.host.toString() !== user.toString()) {
+//       throw new NotAllowedError("You are not the host of this event.");
+//     }
 
-    // Check if the user is already in the attendees list
-    if (event.attendees.includes(userId)) {
-      throw new NotAllowedError(`User ${userId} is already marked as attended!`);
-    }
+//     // Check if the user is already in the attendees list
+//     if (event.attendees.includes(userId)) {
+//       throw new NotAllowedError(`User ${userId} is already marked as attended!`);
+//     }
 
-    // Add the user to the attendees list
-    event.attendees.push(userId);
-    await this.events.partialUpdateOne({ _id: eventId }, { attendees: event.attendees });
-    return { msg: "Attendance marked successfully!" };
-}
+//     // Add the user to the attendees list
+//     event.attendees.push(userId);
+//     await this.events.partialUpdateOne({ _id: eventId }, { attendees: event.attendees });
+//     return { msg: "Attendance marked successfully!" };
+// }
 
   //Update event details given the user is the host of an event 
   async updateEventDetails(user: ObjectId, eventId: ObjectId, updates: Partial<Omit<EventDoc, "_id" | "host" | "attendees" | "status">>) {

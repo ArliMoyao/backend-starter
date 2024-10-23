@@ -2,8 +2,8 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import {Tagging, Upvoting, Streaks, RSVPing, Eventing, Authing,  Posting, Sessioning } from "./app";
-import { PostOptions } from "./concepts/posting";
+import {Tagging, Upvoting, Streaks, RSVPing, Eventing, Authing, Sessioning } from "./app";
+//import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
 import Responses from "./responses";
 import { date, string, z } from "zod";
@@ -15,62 +15,6 @@ import { EventDoc } from "./concepts/events";
  */
 class Routes {
  
-  private tagging: typeof Tagging;
-  private eventing: typeof Eventing;
-
-  constructor(tagging: typeof Tagging, eventing: typeof Eventing) {
-    this.tagging = tagging;
-    this.eventing = eventing;
-  }
-
-
-//increment a user's streak if they attend an event which is part of host controls or reset the streak if a user has not been marked for attendance for an event 
-
-@Router.post("/events")
-@Router.validate(z.object({
-  title: z.string().min(1),
-  description: z.string().min(1),
-  category: z.string().min(1),
-  moodTags: z.array(z.string()).min(1),
-  capacity: z.number().min(1),
-  location: z.string().min(1),
-  date: z.string().refine(val => !isNaN(Date.parse(val)), {
-    message: "Invalid date format"
-  })
-}))
-
-
-
-async createEvent(session: SessionDoc, title: string, description: string, category: string, moodTags: string[], capacity: number, location: string, date: string) {
-  const user = Sessioning.getUser(session);
-
-  // Fetch the available mood tags and categories
-  const availableMoods = await this.tagging.getAvailableMoods();
-  const availableCategories = await this.tagging.getAvailableCategories();
-
-  // Validate the provided mood tags and category
-  const moodTagsArray = moodTags.map(tag => {
-    const mood = availableMoods.find(m => m.id.equals(new ObjectId(tag)));
-    if (!mood) {
-      throw new Error(`Invalid mood tag: ${tag}`);
-    }
-    return new ObjectId(tag);
-  });
-
-  const categoryObject = availableCategories.find(c => c.id.equals(new ObjectId(category)));
-  if (!categoryObject) {
-    throw new Error(`Invalid category: ${category}`);
-  }
-  const categoryObjectId = new ObjectId(category);
-
-  const eventDate = new Date(date);
-
-  const result = await this.eventing.createEvent(user, title, description, categoryObjectId, moodTagsArray, capacity, location, eventDate);
-  return result;
-}
-//routes for Events Concept
-
-//fetch all events\
 @Router.get("/events")
 async getEvents() {
   const events = await Eventing.getEvents();
@@ -78,7 +22,13 @@ async getEvents() {
   return { events };
 }
 
-
+@Router.post("/events")
+async createEvent(session: SessionDoc, title: string, description: string, category: string, moodTag: string[], capacity: number, location: string, date: Date) {
+  const user = Sessioning.getUser(session);
+  const categoryObjectId = new ObjectId(category);
+  const moodTagObjects = moodTag.map((tag) => new ObjectId(tag));
+  return await Eventing.createEvent(user, title, description, categoryObjectId, moodTagObjects, capacity, location, date);
+}
 
 @Router.get("/events/:id")
 @Router.validate(z.object({ id: z.string().min(1) }))
@@ -102,7 +52,7 @@ async updateEvent(session: SessionDoc, id: string, location?: string, eventType?
 @Router.delete("/events/:id/cancel")
 async deleteEvent(session: SessionDoc, id: string) {
   const user = Sessioning.getUser(session);
-  await Posting.createActionPost(user, new ObjectId(id), "deleteEvent");
+ // await Posting.createActionPost(user, new ObjectId(id), "deleteEvent");
 
   return await Eventing.cancelEvent(user, new ObjectId(id));
 }
@@ -143,7 +93,7 @@ async getRSVPs() {
       const rsvp = await RSVPing.rsvpForEvent(user, new ObjectId(id));
       const updatedCapacity = event.capacity - 1;
       await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: updatedCapacity });
-      await Posting.createActionPost(user, new ObjectId(id), "rsvp");
+      //await Posting.createActionPost(user, new ObjectId(id), "rsvp");
       return { msg: rsvp.msg}
   }
   
@@ -167,7 +117,7 @@ async getRSVPs() {
       const rsvp = await RSVPing.cancelRSVP(user, new ObjectId(id));
       event.capacity +=1; 
       await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: event.capacity });
-      await Posting.createActionPost(user, new ObjectId(id), "cancelRsvp");
+      //await Posting.createActionPost(user, new ObjectId(id), "cancelRsvp");
       return { msg: rsvp.msg}
   }
   
@@ -213,7 +163,7 @@ async markAttendance(session: SessionDoc, eventId: string, userId: string, atten
     if (!result){
       console.error("Error incrementing streak")
     }
-    await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
+    //await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
 
   return { msg: streak}
   }
@@ -224,7 +174,7 @@ async markAttendance(session: SessionDoc, eventId: string, userId: string, atten
     if (!resetResult){
       console.error("error resetting streak")
     }
-    await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
+    //await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
     return { msg: streak}
   }
 }
@@ -242,7 +192,7 @@ async getUpvotes() {
 @Router.post("/upvotes/:eventid")
 async upvote(session: SessionDoc, event: string) {
   const user = Sessioning.getUser(session);
-  await Posting.createActionPost(user, new ObjectId(event), "upvote");
+  //await Posting.createActionPost(user, new ObjectId(event), "upvote");
   return await Upvoting.upvote(user, new ObjectId(event));
 }
 
@@ -313,54 +263,54 @@ async removeUpvote(session: SessionDoc, event: string) {
     Sessioning.end(session);
     return { msg: "Logged out!" };
   }
-  // Get posts, optionally filtering by author or action type
-  @Router.get("/posts")
-  @Router.validate(z.object({ author: z.string().optional(), action: z.string().optional() }))
-  async getPosts(author?: string, action?: string) {
-    let posts;
-    if (author) {
-      const id = (await Authing.getUserByUsername(author))._id;
-      posts = await Posting.getByAuthor(id);
-    } else if (action) {
-      posts = await Posting.getPostsByAction(action as "rsvp" | "upvote" | "cancelRsvp" | "createEvent" | "deleteEvent" | "streak");
-    } else {
-      posts = await Posting.getPosts();
-    }
-    return Responses.posts(posts);
-  }
+  // // Get posts, optionally filtering by author or action type
+  // @Router.get("/posts")
+  // @Router.validate(z.object({ author: z.string().optional(), action: z.string().optional() }))
+  // async getPosts(author?: string, action?: string) {
+  //   let posts;
+  //   if (author) {
+  //     const id = (await Authing.getUserByUsername(author))._id;
+  //     posts = await Posting.getByAuthor(id);
+  //   } else if (action) {
+  //     posts = await Posting.getPostsByAction(action as "rsvp" | "upvote" | "cancelRsvp" | "createEvent" | "deleteEvent" | "streak");
+  //   } else {
+  //     posts = await Posting.getPosts();
+  //   }
+  //   return Responses.posts(posts);
+  // }
 
 
 
-    // Create a post associated with an action (RSVP, upvote, etc.) and optionally generate a notification
-    @Router.post("/posts/action")
-    @Router.validate(z.object({ content: z.string(), eventId: z.string().optional(), action: z.string() }))
-    async createActionPost(session: SessionDoc, action: "rsvp" | "cancelRsvp" | "createEvent" | "deleteEvent" | "streak" | "upvote", eventId?: string) {
-      const user = Sessioning.getUser(session);
-      const eventObjectId = eventId ? new ObjectId(eventId) : undefined;
-      const created = await Posting.createActionPost(user, eventObjectId || new ObjectId(), action);
-      return { msg: created.msg, post: await Responses.post(created.post), notification: created.notification };
-    }
+  //   // Create a post associated with an action (RSVP, upvote, etc.) and optionally generate a notification
+  //   @Router.post("/posts/action")
+  //   @Router.validate(z.object({ content: z.string(), eventId: z.string().optional(), action: z.string() }))
+  //   async createActionPost(session: SessionDoc, action: "rsvp" | "cancelRsvp" | "createEvent" | "deleteEvent" | "streak" | "upvote", eventId?: string) {
+  //     const user = Sessioning.getUser(session);
+  //     const eventObjectId = eventId ? new ObjectId(eventId) : undefined;
+  //     const created = await Posting.createActionPost(user, eventObjectId || new ObjectId(), action);
+  //     return { msg: created.msg, post: await Responses.post(created.post), notification: created.notification };
+  //   }
 
 
-      // Update a post
-    @Router.patch("/posts/:id")
-    @Router.validate(z.object({ content: z.string().optional(), options: z.object({ backgroundColor: z.string().optional() }).optional() }))
-    async update(session: SessionDoc, id: string, content?: string, options?: PostOptions) {
-      const user = Sessioning.getUser(session);
-      const oid = new ObjectId(id);
-      await Posting.assertAuthorIsUser(oid, user);
-      return await Posting.update(oid, content, options);
-    }
+  //     // Update a post
+  //   @Router.patch("/posts/:id")
+  //   @Router.validate(z.object({ content: z.string().optional(), options: z.object({ backgroundColor: z.string().optional() }).optional() }))
+  //   async update(session: SessionDoc, id: string, content?: string, options?: PostOptions) {
+  //     const user = Sessioning.getUser(session);
+  //     const oid = new ObjectId(id);
+  //     await Posting.assertAuthorIsUser(oid, user);
+  //     return await Posting.update(oid, content, options);
+  //   }
 
 
-  // Delete a post
-  @Router.delete("/posts/:id")
-  async deletePost(session: SessionDoc, id: string) {
-    const user = Sessioning.getUser(session);
-    const oid = new ObjectId(id);
-    await Posting.assertAuthorIsUser(oid, user);
-    return Posting.delete(oid);
-  }
+  // // Delete a post
+  // @Router.delete("/posts/:id")
+  // async deletePost(session: SessionDoc, id: string) {
+  //   const user = Sessioning.getUser(session);
+  //   const oid = new ObjectId(id);
+  //   await Posting.assertAuthorIsUser(oid, user);
+  //   return Posting.delete(oid);
+  // }
 
   //tagging concept 
 
