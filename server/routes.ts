@@ -13,54 +13,37 @@ import Responses from "./responses";
  * Web server routes for the app. Implements synchronizations between concepts.
  */
 class Routes {
-  @Router.get("/events") //returns an array of all events
-  async getEvents() {
-    const events = await Eventing.getEvents();
 
-    return { events };
-  }
-
-  // @Router.post("/events")
-  // async createEventPost(session: SessionDoc, title: string, description: string, category: string, moodTag: string, capacity: number, location: string, date: Date) {
-  //   // const eventDate = new Date(date);
-  //   // const user = Sessioning.getUser(session);
-  //   // const categoryObjectId = new ObjectId(category);
-  //   // const moodTagObjectId = new ObjectId(moodTag);
-
-  //   return await Eventing.createEvent(user, title, description, categoryObjectId, moodTagObjectId, capacity, location, date);
-
-  // }
 
   @Router.post("/events")
-  async createEventPost(session: SessionDoc, title: string, description: string, category: string) {
-    // const eventDate = new Date(date);
+  async createEventPost(session: SessionDoc, title: string, description: string, category: string, date: Date) {
     const user = Sessioning.getUser(session);
-    const categoryObjectId = new ObjectId(category);
-    // const moodTagObjectId = new ObjectId(moodTag);
-
-    return await Eventing.createEvent(user, title, description, categoryObjectId);
+    const create = await Posting.create(user, title, description, category, date);
+    return { msg: create.msg, post: await Responses.post(create.post) };
   }
 
-  @Router.get("/events/:id")
-  async getEvent(id: string) {
-    //this route fetches details of a specific event
-    return Eventing.lookupEventDetails(new ObjectId(id));
-  }
-  //edit event details of a specific event
-  @Router.patch("/events/:id")
-  async updateEvent(session: SessionDoc, id: string, location?: string, eventType?: string, capacity?: number) {
-    const user = Sessioning.getUser(session);
-    return await Eventing.updateEventDetails(user, new ObjectId(id), { location, capacity });
-  }
+  // @Router.get("/events/:id")
+  // @Router.validate(z.object({ author: z.string().optional() }))
 
-  //delete a specific event
-  @Router.delete("/events/:id/cancel")
-  async deleteEvent(session: SessionDoc, id: string) {
-    const user = Sessioning.getUser(session);
-    // await Posting.createActionPost(user, new ObjectId(id), "deleteEvent");
+  // async getEvent(id: string) {
+  //   //this route fetches details of a specific event
+  //   return Eventing.lookupEventDetails(new ObjectId(id));
+  // }
+  // //edit event details of a specific event
+  // @Router.patch("/events/:id")
+  // async updateEvent(session: SessionDoc, id: string, location?: string, eventType?: string, capacity?: number) {
+  //   const user = Sessioning.getUser(session);
+  //   return await Eventing.updateEventDetails(user, new ObjectId(id), { location, capacity });
+  // }
 
-    return await Eventing.cancelEvent(user, new ObjectId(id));
-  }
+  // //delete a specific event
+  // @Router.delete("/events/:id/cancel")
+  // async deleteEvent(session: SessionDoc, id: string) {
+  //   const user = Sessioning.getUser(session);
+  //   // await Posting.createActionPost(user, new ObjectId(id), "deleteEvent");
+
+  //   return await Eventing.cancelEvent(user, new ObjectId(id));
+  // }
 
   //RSVPing concept
 
@@ -78,48 +61,48 @@ class Routes {
   //step 4: update the event capacity
   //step 5: create a post for the user that they rsvp'd to the event
 
-  @Router.post("/events/:id/rsvp")
-  async rsvpToEvent(session: SessionDoc, id: string) {
-    const user = Sessioning.getUser(session);
-    const event = await Eventing.lookupEventDetails(new ObjectId(id));
-    const rsvpList = await RSVPing.getRSVPs(new ObjectId(id));
-    if (event.capacity <= rsvpList.length) {
-      throw new Error("Event is full");
-    }
+  // @Router.post("/events/:id/rsvp")
+  // async rsvpToEvent(session: SessionDoc, id: string) {
+  //   const user = Sessioning.getUser(session);
+  //   const event = await Eventing.lookupEventDetails(new ObjectId(id));
+  //   const rsvpList = await RSVPing.getRSVPs(new ObjectId(id));
+  //   if (event.capacity <= rsvpList.length) {
+  //     throw new Error("Event is full");
+  //   }
 
-    const hasRSVD = await RSVPing.hasRSVPd(user, new ObjectId(id));
-    if (hasRSVD) {
-      throw new Error("You have already RSVP'd to this event");
-    }
+  //   const hasRSVD = await RSVPing.hasRSVPd(user, new ObjectId(id));
+  //   if (hasRSVD) {
+  //     throw new Error("You have already RSVP'd to this event");
+  //   }
 
-    const rsvp = await RSVPing.rsvpForEvent(user, new ObjectId(id));
-    const updatedCapacity = event.capacity - 1;
-    await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: updatedCapacity });
-    //await Posting.createActionPost(user, new ObjectId(id), "rsvp");
-    return { msg: rsvp.msg };
-  }
+  //   const rsvp = await RSVPing.rsvpForEvent(user, new ObjectId(id));
+  //   const updatedCapacity = event.capacity - 1;
+  //   await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: updatedCapacity });
+  //   //await Posting.createActionPost(user, new ObjectId(id), "rsvp");
+  //   return { msg: rsvp.msg };
+  // }
 
-  //when user cancels their rsvp
-  @Router.delete("/events/:id/rsvp")
-  async cancelRSVP(session: SessionDoc, id: string) {
-    const user = Sessioning.getUser(session);
-    const event = await Eventing.lookupEventDetails(new ObjectId(id));
-    const rsvpList = await RSVPing.getRSVPs(new ObjectId(id));
-    if (event.capacity <= rsvpList.length) {
-      throw new Error("Event is full");
-    }
+  // //when user cancels their rsvp
+  // @Router.delete("/events/:id/rsvp")
+  // async cancelRSVP(session: SessionDoc, id: string) {
+  //   const user = Sessioning.getUser(session);
+  //   const event = await Eventing.lookupEventDetails(new ObjectId(id));
+  //   const rsvpList = await RSVPing.getRSVPs(new ObjectId(id));
+  //   if (event.capacity <= rsvpList.length) {
+  //     throw new Error("Event is full");
+  //   }
 
-    const hasRSVD = await RSVPing.hasRSVPd(user, new ObjectId(id));
-    if (!hasRSVD) {
-      throw new Error("You have not RSVP'd to this event");
-    }
+  //   const hasRSVD = await RSVPing.hasRSVPd(user, new ObjectId(id));
+  //   if (!hasRSVD) {
+  //     throw new Error("You have not RSVP'd to this event");
+  //   }
 
-    const rsvp = await RSVPing.cancelRSVP(user, new ObjectId(id));
-    event.capacity += 1;
-    await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: event.capacity });
-    //await Posting.createActionPost(user, new ObjectId(id), "cancelRsvp");
-    return { msg: rsvp.msg };
-  }
+  //   const rsvp = await RSVPing.cancelRSVP(user, new ObjectId(id));
+  //   event.capacity += 1;
+  //   await Eventing.updateEventDetails(user, new ObjectId(id), { location: event.location, capacity: event.capacity });
+  //   //await Posting.createActionPost(user, new ObjectId(id), "cancelRsvp");
+  //   return { msg: rsvp.msg };
+  // }
 
   //get details of a specific rsvp
   @Router.get("/rsvps/:id")

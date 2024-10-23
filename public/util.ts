@@ -22,6 +22,31 @@ const operations: Operation[] = [
     method: "POST",
     fields: { content: "input" },
   },
+  {
+    name: "Get Posts (empty for all)",
+    endpoint: "/api/posts",
+    method: "GET",
+    fields: { author: "input" },
+  },
+  {
+    name: "Create Post",
+    endpoint: "/api/posts",
+    method: "POST",
+    fields: { content: "input" },
+  },
+  {
+    name: "Update Post",
+    endpoint: "/api/posts/:id",
+    method: "PATCH",
+    fields: { id: "input", content: "input", options: { backgroundColor: "input" } },
+  },
+  {
+    name: "Delete Post",
+    endpoint: "/api/posts/:id",
+    method: "DELETE",
+    fields: { id: "input" },
+  },
+ 
   
   {
     name: "Get Session User (logged in user)",
