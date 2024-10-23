@@ -430,7 +430,7 @@ async removeTagFromEvent(session: SessionDoc, eventId: string, tagId: string) {
 
 /** The web app. */
 
-export const app = new Routes(Tagging, Eventing);
+export const app = new Routes();
 
 /** The Express router. */
 export const appRouter = getExpressRouter(app);
