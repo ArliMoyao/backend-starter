@@ -22,19 +22,19 @@ class Routes {
     return { msg: create.msg, event: await Responses.event(create.event) };
   }
 
-  // @Router.get("/events/:id")
-  // @Router.validate(z.object({ author: z.string().optional() }))
 
-  // async getEvent(id: string) {
-  //   //this route fetches details of a specific event
-  //   return Eventing.lookupEventDetails(new ObjectId(id));
-  // }
-  // //edit event details of a specific event
-  // @Router.patch("/events/:id")
-  // async updateEvent(session: SessionDoc, id: string, location?: string, eventType?: string, capacity?: number) {
-  //   const user = Sessioning.getUser(session);
-  //   return await Eventing.updateEventDetails(user, new ObjectId(id), { location, capacity });
-  // }
+  //get all events 
+  @Router.get("/events")
+  async getEvent(id: string) {
+    return Eventing.getEvents();
+  }
+
+  //edit event details of a specific event
+  @Router.patch("/events/:id")
+  async updateEvent(session: SessionDoc, id: string, location?: string, eventType?: string, capacity?: number) {
+    const user = Sessioning.getUser(session);
+    return await Eventing.update(new ObjectId(id), { location, capacity });
+  }
 
   // //delete a specific event
   // @Router.delete("/events/:id/cancel")

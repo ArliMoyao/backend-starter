@@ -116,16 +116,6 @@ const operations: Operation[] = [
       date: "input"
     },
   },
-  {
-    name: "Create Event",
-    endpoint: "/api/events",
-    method: "POST",
-    fields: {
-      title: "input",
-      description: "input",
-      category: "input", 
-    },
-  },
 
   { name: "Get Categories", endpoint: "/api/categories", method: "GET", fields: {} },
   {
