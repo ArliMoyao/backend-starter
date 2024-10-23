@@ -179,4 +179,4 @@ export default class TaggingConcept {
   //   const events = await this.events.readMany({ category: categoryId });
   //   return events;
   // }
-  }
+  }}
