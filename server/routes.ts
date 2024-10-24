@@ -49,15 +49,20 @@ class Routes {
     return await Eventing.delete(oid);
   }
 
-
-  //tagging 
-  //get all categories
+  //get the list of predefined categories
   @Router.get("/categories")
-  async getCategories(id: string, name: string) {
-    return await Tagging.setCategories();
+  async getCategories(req: any, res: any) {
+    try {
+      const categories = await Tagging.setCategories();
+      res.json(categories);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(500).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: "An unknown error occurred" });
+      }
+    }
   }
-  
-
 
   //RSVPing concept
   //list all RSVPs
