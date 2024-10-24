@@ -52,8 +52,8 @@ class Routes {
   //posr the list of predefined categories
   @Router.get("/categories")
   async getCategories(req: any, res: any) {
-    return await Tagging.setCategories
-  }
+    const categories: any = await Responses.categories(Tagging);
+    res.json(categories);}
 //get list of predefined moods
   @Router.get("/moods")
   async getMoods(req: any, res: any) {
