@@ -39,7 +39,14 @@ class Routes {
     await Eventing.assertHostIsUser(oid, user);
     return await Eventing.update(new ObjectId(id), { description, location, capacity });
   }
-
+  @Router.patch("/posts/:id")
+  async updatePost(session: SessionDoc, id: string, content?: string, options?: PostOptions) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(id);
+    await Posting.assertAuthorIsUser(oid, user);
+    return await Posting.update(oid, content, options);
+  }
+}
   // //delete a specific event
   @Router.delete("/events/:id")
   async deleteEvent(session: SessionDoc, id: string) {

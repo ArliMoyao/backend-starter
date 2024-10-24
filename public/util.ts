@@ -108,13 +108,9 @@ const operations: Operation[] = [
     method: "PATCH",
     fields: {
       id: "input",
-      title: "input",
       description: "input",
-      category: "input",
-      moodTag: "input",
       capacity: "input",
       location: "input",
-      date: "input",
     },
   },
 
