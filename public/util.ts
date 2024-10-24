@@ -118,8 +118,6 @@ const operations: Operation[] = [
   { name: "Get Categories", endpoint: "/api/categories", method: "GET", fields: {} },
   
   
-  
-  
   {
     name: "Delete Event",
     endpoint: "/api/events/:id",

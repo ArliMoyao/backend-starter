@@ -3,11 +3,10 @@ import { NotAllowedError, NotFoundError } from "./errors";
 import DocCollection, { BaseDoc } from "../framework/doc";
 
 // Define the interfaces for Tags, Moods, and Events
-
-export interface UserDoc extends BaseDoc {
-  userMood?: ObjectId; // Reference to MoodDoc
+export interface TagDoc extends BaseDoc {
+  userMood: ObjectId;
+  eventCategory: ObjectId;
 }
-
 export interface EventDoc extends BaseDoc {
   host: ObjectId;
   location: string;
@@ -24,28 +23,26 @@ export interface EventDoc extends BaseDoc {
  */
 export default class TaggingConcept {
   public readonly events: DocCollection<EventDoc>;
-  public readonly users: DocCollection<UserDoc>;
-
   // Predefined Moods and Categories
   private predefinedMoods = [
-    { id: new ObjectId(), name: "Excited" },
-    { id: new ObjectId(), name: "Relaxed" },
-    { id: new ObjectId(), name: "Creative" },
-    { id: new ObjectId(), name: "Social" },
-    { id: new ObjectId(), name: "Curious" },
-    { id: new ObjectId(), name: "Adventurous" },
-    { id: new ObjectId(), name: "Focused" },
-    { id: new ObjectId(), name: "Playful" },
-    { id: new ObjectId(), name: "Romantic" },
-    { id: new ObjectId(), name: "Reflective" },
-    { id: new ObjectId(), name: "Energetic" },
-    { id: new ObjectId(), name: "Motivated" },
-    { id: new ObjectId(), name: "Calm" },
-    { id: new ObjectId(), name: "Inspired" },
-    { id: new ObjectId(), name: "Nostalgic" },
-    { id: new ObjectId(), name: "Productive" },
-    { id: new ObjectId(), name: "Spontaneous" },
-    { id: new ObjectId(), name: "Contemplative" },
+    { moodid: new ObjectId(), name: "Excited" },
+    { moodid: new ObjectId(), name: "Relaxed" },
+    { moodid: new ObjectId(), name: "Creative" },
+    { moodid: new ObjectId(), name: "Social" },
+    { moodid: new ObjectId(), name: "Curious" },
+    { moodid: new ObjectId(), name: "Adventurous" },
+    { moodid: new ObjectId(), name: "Focused" },
+    { moodid: new ObjectId(), name: "Playful" },
+    { moodid: new ObjectId(), name: "Romantic" },
+    { moodid: new ObjectId(), name: "Reflective" },
+    { moodid: new ObjectId(), name: "Energetic" },
+    { moodid: new ObjectId(), name: "Motivated" },
+    { moodid: new ObjectId(), name: "Calm" },
+    { moodid: new ObjectId(), name: "Inspired" },
+    { moodid: new ObjectId(), name: "Nostalgic" },
+    { moodid: new ObjectId(), name: "Productive" },
+    { moodid: new ObjectId(), name: "Spontaneous" },
+    { moodid: new ObjectId(), name: "Contemplative" },
   ];
 
   private predefinedCategories = [
@@ -76,7 +73,6 @@ export default class TaggingConcept {
    */
   constructor(tagCollectionName: string, moodCollectionName: string, eventCollectionName: string, userCollectionName: string) {
     this.events = new DocCollection<EventDoc>(eventCollectionName);
-    this.users = new DocCollection<UserDoc>(userCollectionName);
   }
 
   // /**
@@ -129,14 +125,14 @@ export default class TaggingConcept {
    * Get all predefined moods
    */
   async setMoods(): Promise<{ id: ObjectId; name: string }[]> {
-    return this.predefinedMoods;
-  }
+      return this.predefinedMoods.map(mood => ({ id: mood.moodid, name: mood.name }));
+    }
 
   /**
    * Get all predefined categories
    */
   async setCategories(): Promise<{ id: ObjectId; name: string }[]> {
-    return this.predefinedCategories;
+    return this.predefinedCategories.map(category => ({ id: category.id, name: category.name }));
   }
 
   /**
@@ -144,7 +140,7 @@ export default class TaggingConcept {
    */
 
   async getMoodById(moodId: ObjectId): Promise<{ id: ObjectId; name: string }> {
-    const mood = this.predefinedMoods.find(m => m.id.equals(moodId));
+    const mood = this.predefinedMoods.find(m => m.moodid.equals(id));
     if (!mood) throw new NotFoundError(`Mood ${moodId} does not exist!`);
     return mood;
   }
