@@ -140,9 +140,9 @@ export default class TaggingConcept {
    */
 
   async getMoodById(moodId: ObjectId): Promise<{ id: ObjectId; name: string }> {
-    const mood = this.predefinedMoods.find(m => m.moodid.equals(id));
+    const mood = this.predefinedMoods.find(m => m.moodid.equals(moodId));
     if (!mood) throw new NotFoundError(`Mood ${moodId} does not exist!`);
-    return mood;
+    return { id: mood.moodid, name: mood.name };
   }
   
   /**
@@ -151,7 +151,7 @@ export default class TaggingConcept {
   async getCategoryById(categoryId: ObjectId): Promise<{ id: ObjectId; name: string }> {
     const category = this.predefinedCategories.find(c => c.id.equals(categoryId));
     if (!category) throw new NotFoundError(`Category ${categoryId} does not exist!`);
-    return category;
+    return { id: category.id, name: category.name };
   
   
     // /**
