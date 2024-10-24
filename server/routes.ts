@@ -51,7 +51,7 @@ class Routes {
 
 
 
-  
+
   //RSVPing concept
   //list all RSVPs
   @Router.get("/rsvps")
@@ -419,6 +419,13 @@ class Routes {
     const user = Sessioning.getUser(session);
     const created = await Posting.create(user, content, options);
     return { msg: created.msg, post: await Responses.post(created.post) };
+  }
+  @Router.patch("/posts/:id")
+  async updatePost(session: SessionDoc, id: string, content?: string, options?: PostOptions) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(id);
+    await Posting.assertAuthorIsUser(oid, user);
+    return await Posting.update(oid, content, options);
   }
 }
 
