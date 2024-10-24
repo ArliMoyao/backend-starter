@@ -96,12 +96,7 @@ const operations: Operation[] = [
     method: "GET",
     fields: {},
   },
-  // {
-  //   name: "Get Event Details",
-  //   endpoint: "/api/events/:id",
-  //   method: "GET",
-  //   fields: { id: "input" },
-  // },
+ 
   {
     name: "Create Event",
     endpoint: "/api/events",

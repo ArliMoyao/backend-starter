@@ -53,8 +53,7 @@ export default class EventsConcept {
   async getByHost(host: ObjectId) {
     return await this.events.readMany({ host });
   }
-
-  async update(_id: ObjectId, updates: Partial<Omit<EventDoc, "_id" | "host" | "attendees" | "status">>) {
+  async update(_id: ObjectId, updates: Partial<Omit<EventDoc, "_id" | "host" | "attendees">>) {
     await this.events.partialUpdateOne({ _id }, updates);
     return { msg: "Event successfully updated!" };
   }

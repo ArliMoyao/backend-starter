@@ -15,6 +15,7 @@ import Responses from "./responses";
 class Routes {
 
 
+  //eventing concept
   @Router.post("/events")
   async create(session: SessionDoc, title: string, description: string, category: ObjectId, moodTag: ObjectId, capacity: number,  location: string, date: Date) {
     const user = Sessioning.getUser(session);
