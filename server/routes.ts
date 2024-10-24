@@ -31,23 +31,28 @@ class Routes {
   }
 
   //edit event details of a specific event
+  //can only edit description, 1ocation, capacity
   @Router.patch("/events/:id")
-  async updateEvent(session: SessionDoc, id: string, location?: string, eventType?: string, capacity?: number) {
+  async updateEvent(session: SessionDoc, id: string, description?:string, location?: string, capacity?: number) {
     const user = Sessioning.getUser(session);
-    return await Eventing.update(new ObjectId(id), { location, capacity });
+    const oid = new ObjectId(id);
+    await Eventing.assertHostIsUser(oid, user);
+    return await Eventing.update(new ObjectId(id), { description, location, capacity });
   }
 
   // //delete a specific event
-  // @Router.delete("/events/:id/cancel")
-  // async deleteEvent(session: SessionDoc, id: string) {
-  //   const user = Sessioning.getUser(session);
-  //   // await Posting.createActionPost(user, new ObjectId(id), "deleteEvent");
+  @Router.delete("/events/:id")
+  async deleteEvent(session: SessionDoc, id: string) {
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(id);
+    await Eventing.assertHostIsUser(oid, user);
+    return await Eventing.delete(oid);
+  }
 
-  //   return await Eventing.cancelEvent(user, new ObjectId(id));
-  // }
 
+
+  
   //RSVPing concept
-
   //list all RSVPs
   @Router.get("/rsvps")
   async getRSVPs() {

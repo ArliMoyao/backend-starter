@@ -29,12 +29,6 @@ const operations: Operation[] = [
     fields: { author: "input" },
   },
   {
-    name: "Create Post",
-    endpoint: "/api/posts",
-    method: "POST",
-    fields: { content: "input" },
-  },
-  {
     name: "Update Post",
     endpoint: "/api/posts/:id",
     method: "PATCH",
@@ -46,8 +40,6 @@ const operations: Operation[] = [
     method: "DELETE",
     fields: { id: "input" },
   },
- 
-  
   {
     name: "Get Session User (logged in user)",
     endpoint: "/api/session",
@@ -96,7 +88,6 @@ const operations: Operation[] = [
     method: "GET",
     fields: {},
   },
- 
   {
     name: "Create Event",
     endpoint: "/api/events",
@@ -104,21 +95,34 @@ const operations: Operation[] = [
     fields: {
       title: "input",
       description: "input",
-      category: "input", 
-      moodTag: "input", 
+      category: "input",
+      moodTag: "input",
       capacity: "input",
       location: "input",
-      date: "input"
+      date: "input",
     },
   },
-
-  { name: "Get Categories", endpoint: "/api/categories", method: "GET", fields: {} },
   {
     name: "Update Event",
     endpoint: "/api/events/:id",
-    method: "PUT",
-    fields: { id: "input", location: "input", eventType: "input", capacity: "input" },
+    method: "PATCH",
+    fields: {
+      id: "input",
+      title: "input",
+      description: "input",
+      category: "input",
+      moodTag: "input",
+      capacity: "input",
+      location: "input",
+      date: "input",
+    },
   },
+
+
+
+
+
+  { name: "Get Categories", endpoint: "/api/categories", method: "GET", fields: {} },
   {
     name: "Delete Event",
     endpoint: "/api/events/:id",
