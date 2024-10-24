@@ -49,8 +49,8 @@ class Routes {
     return await Eventing.delete(oid);
   }
 
-  //get the list of predefined categories
-  @Router.get("/categories")
+  //posr the list of predefined categories
+  @Router.post("/categories")
   async getCategories(req: any, res: any) {
      try{
       const categories: any = await Responses.categories(Tagging);
