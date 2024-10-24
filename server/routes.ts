@@ -40,7 +40,7 @@ class Routes {
     return await Eventing.update(new ObjectId(id), { description, location, capacity });
   }
 
-  // //delete a specific event
+  //delete a specific event
   @Router.delete("/events/:id")
   async deleteEvent(session: SessionDoc, id: string) {
     const user = Sessioning.getUser(session);
@@ -52,9 +52,14 @@ class Routes {
   //get the list of predefined categories
   @Router.get("/categories")
   async getCategories(req: any, res: any) {
-      const categories = await Tagging.setCategories();
+      const categories: any = await Responses.categories();
       res.json(categories);
-    
+  }
+//get list of predefined moods
+  @Router.get("/moods")
+  async getMoods(req: any, res: any) {
+      const moods: any = await Responses.moods();
+      res.json(moods);
   }
 
   //RSVPing concept

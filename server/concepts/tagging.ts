@@ -24,7 +24,7 @@ export interface EventDoc extends BaseDoc {
 export default class TaggingConcept {
   public readonly events: DocCollection<EventDoc>;
   // Predefined Moods and Categories
-  private predefinedMoods = [
+  private predefinedMoods:{ moodid: ObjectId; name: string }[]  = [
     { moodid: new ObjectId(), name: "Excited" },
     { moodid: new ObjectId(), name: "Relaxed" },
     { moodid: new ObjectId(), name: "Creative" },
@@ -45,7 +45,7 @@ export default class TaggingConcept {
     { moodid: new ObjectId(), name: "Contemplative" },
   ];
 
-  private predefinedCategories = [
+  private predefinedCategories: { id: ObjectId; name: string }[] = [
     { id: new ObjectId(), name: "Music & Concerts" },
     { id: new ObjectId(), name: "Fitness & Wellness" },
     { id: new ObjectId(), name: "Arts & Crafts" },

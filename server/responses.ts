@@ -3,7 +3,8 @@ import { Authing } from "./app";
 import { Router } from "./framework/router";
 import { PostAuthorNotMatchError, PostDoc } from "./concepts/posting";
 import { EventDoc } from "./concepts/events";
-import {TagDoc} from "./concepts/tagging";
+import { TagDoc } from "./concepts/tagging";
+import TaggingConcept from "./concepts/tagging";
 /**
  * This class does useful conversions for the frontend.
  * For example, it converts a {@link PostDoc} into a more readable format for the frontend.
@@ -89,5 +90,19 @@ static async event(event: EventDoc | null) {
 static async posts(posts: PostDoc[]) {
   const authors = await Authing.idsToUsernames(posts.map((post) => post.author));
   return posts.map((post, i) => ({ ...post, author: authors[i] }));
+}
+
+//getting the categories
+static async categories() {
+  const Tagging = new TaggingConcept('tags', 'moods', 'events', 'users');
+  const categories = await Tagging.setCategories();
+  return categories;
+}
+
+//getting the moods
+static async moods() {
+  const Tagging = new TaggingConcept('tags', 'moods', 'events', 'users');
+  const moods = await Tagging.setMoods();
+  return moods;
 }
 }
