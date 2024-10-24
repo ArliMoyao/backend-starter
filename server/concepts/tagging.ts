@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
-import { NotAllowedError, NotFoundError } from "./errors";
 import DocCollection, { BaseDoc } from "../framework/doc";
+import { NotFoundError } from "./errors";
 
 // Define the interfaces for Tags, Moods, and Events
 export interface TagDoc extends BaseDoc {
@@ -24,7 +24,7 @@ export interface EventDoc extends BaseDoc {
 export default class TaggingConcept {
   public readonly events: DocCollection<EventDoc>;
   // Predefined Moods and Categories
-  private predefinedMoods:{ moodid: ObjectId; name: string }[]  = [
+  private predefinedMoods: { moodid: ObjectId; name: string }[] = [
     { moodid: new ObjectId(), name: "Excited" },
     { moodid: new ObjectId(), name: "Relaxed" },
     { moodid: new ObjectId(), name: "Creative" },
@@ -44,7 +44,6 @@ export default class TaggingConcept {
     { moodid: new ObjectId(), name: "Spontaneous" },
     { moodid: new ObjectId(), name: "Contemplative" },
   ];
-
   private predefinedCategories: { id: ObjectId; name: string }[] = [
     { id: new ObjectId(), name: "Music & Concerts" },
     { id: new ObjectId(), name: "Fitness & Wellness" },
@@ -125,14 +124,14 @@ export default class TaggingConcept {
    * Get all predefined moods
    */
   async setMoods(): Promise<{ id: ObjectId; name: string }[]> {
-      return this.predefinedMoods.map(mood => ({ id: mood.moodid, name: mood.name }));
-    }
+    return this.predefinedMoods.map((mood) => ({ id: mood.moodid, name: mood.name }));
+  }
 
   /**
    * Get all predefined categories
    */
   async setCategories(): Promise<{ id: ObjectId; name: string }[]> {
-    return this.predefinedCategories.map(category => ({ id: category.id, name: category.name }));
+    return this.predefinedCategories.map((category) => ({ id: category.id, name: category.name }));
   }
 
   /**
@@ -140,39 +139,39 @@ export default class TaggingConcept {
    */
 
   async getMoodById(moodId: ObjectId): Promise<{ id: ObjectId; name: string }> {
-    const mood = this.predefinedMoods.find(m => m.moodid.equals(moodId));
+    const mood = this.predefinedMoods.find((m) => m.moodid.equals(moodId));
     if (!mood) throw new NotFoundError(`Mood ${moodId} does not exist!`);
     return { id: mood.moodid, name: mood.name };
   }
-  
+
   /**
    * retrieve a category by its id ex use case, when user is clicking through a list of categories to filter events associated with that category
    */
   async getCategoryById(categoryId: ObjectId): Promise<{ id: ObjectId; name: string }> {
-    const category = this.predefinedCategories.find(c => c.id.equals(categoryId));
+    const category = this.predefinedCategories.find((c) => c.id.equals(categoryId));
     if (!category) throw new NotFoundError(`Category ${categoryId} does not exist!`);
     return { id: category.id, name: category.name };
-  
-  
+
     // /**
-  //  * Lookup events based on user's mood
-  //  */
-  // async lookupEventsByMood(userId: ObjectId): Promise<EventDoc[]> {
-  //   const user = await this.users.readOne({ _id: userId });
-  //   if (!user || !user.userMood) {
-  //     throw new NotFoundError(`User ${userId} does not have a mood set.`);
-  //   }
+    //  * Lookup events based on user's mood
+    //  */
+    // async lookupEventsByMood(userId: ObjectId): Promise<EventDoc[]> {
+    //   const user = await this.users.readOne({ _id: userId });
+    //   if (!user || !user.userMood) {
+    //     throw new NotFoundError(`User ${userId} does not have a mood set.`);
+    //   }
 
-  //   // Find events that match the user's selected mood
-  //   const events = await this.events.readMany({ moodTag: user.userMood });
-  //   return events;
-  // }
+    //   // Find events that match the user's selected mood
+    //   const events = await this.events.readMany({ moodTag: user.userMood });
+    //   return events;
+    // }
 
-  // /**
-  //  * Fetch events by category
-  //  */
-  // async filterEventsByCategory(categoryId: ObjectId): Promise<EventDoc[]> {
-  //   const events = await this.events.readMany({ category: categoryId });
-  //   return events;
-  // }
-  }}
+    // /**
+    //  * Fetch events by category
+    //  */
+    // async filterEventsByCategory(categoryId: ObjectId): Promise<EventDoc[]> {
+    //   const events = await this.events.readMany({ category: categoryId });
+    //   return events;
+    // }
+  }
+}
