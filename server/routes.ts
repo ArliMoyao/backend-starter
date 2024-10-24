@@ -53,7 +53,8 @@ class Routes {
   @Router.get("/categories")
   async getCategories(req: any, res: any) {
      try{
-      const categories: any = await Responses.categories();
+      const categories: any = await Responses.categories(Tagging);
+      console.log("sending categories", categories);
       res.json(categories);
      }
     
@@ -64,7 +65,7 @@ class Routes {
 //get list of predefined moods
   @Router.get("/moods")
   async getMoods(req: any, res: any) {
-      const moods: any = await Responses.moods();
+      const moods: any = await Responses.moods(Tagging);
       res.json(moods);
   }
 
