@@ -50,17 +50,9 @@ class Routes {
   }
 
   //posr the list of predefined categories
-  @Router.post("/categories")
+  @Router.get("/categories")
   async getCategories(req: any, res: any) {
-     try{
-      const categories: any = await Responses.categories(Tagging);
-      console.log("sending categories", categories);
-      res.json(categories);
-     }
-    
-    catch(err){
-      console.log("error fetching categories", err);
-    }
+    return await Tagging.setCategories
   }
 //get list of predefined moods
   @Router.get("/moods")

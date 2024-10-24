@@ -22,56 +22,58 @@ export interface EventDoc extends BaseDoc {
  * Concept: Tagging [Tag, Mood, Event]
  */
 export default class TaggingConcept {
-  public readonly events: DocCollection<EventDoc>;
-  // Predefined Moods and Categories
-  private predefinedMoods: { moodid: ObjectId; name: string }[] = [
-    { moodid: new ObjectId(), name: "Excited" },
-    { moodid: new ObjectId(), name: "Relaxed" },
-    { moodid: new ObjectId(), name: "Creative" },
-    { moodid: new ObjectId(), name: "Social" },
-    { moodid: new ObjectId(), name: "Curious" },
-    { moodid: new ObjectId(), name: "Adventurous" },
-    { moodid: new ObjectId(), name: "Focused" },
-    { moodid: new ObjectId(), name: "Playful" },
-    { moodid: new ObjectId(), name: "Romantic" },
-    { moodid: new ObjectId(), name: "Reflective" },
-    { moodid: new ObjectId(), name: "Energetic" },
-    { moodid: new ObjectId(), name: "Motivated" },
-    { moodid: new ObjectId(), name: "Calm" },
-    { moodid: new ObjectId(), name: "Inspired" },
-    { moodid: new ObjectId(), name: "Nostalgic" },
-    { moodid: new ObjectId(), name: "Productive" },
-    { moodid: new ObjectId(), name: "Spontaneous" },
-    { moodid: new ObjectId(), name: "Contemplative" },
-  ];
-  private predefinedCategories: { id: ObjectId; name: string }[] = [
-    { id: new ObjectId(), name: "Music & Concerts" },
-    { id: new ObjectId(), name: "Fitness & Wellness" },
-    { id: new ObjectId(), name: "Arts & Crafts" },
-    { id: new ObjectId(), name: "Food & Drink" },
-    { id: new ObjectId(), name: "Outdoor & Adventure" },
-    { id: new ObjectId(), name: "Social & Networking" },
-    { id: new ObjectId(), name: "Workshops & Classes" },
-    { id: new ObjectId(), name: "Sports & Fitness" },
-    { id: new ObjectId(), name: "Film & Theater" },
-    { id: new ObjectId(), name: "Tech & Innovation" },
-    { id: new ObjectId(), name: "Community & Volunteering" },
-    { id: new ObjectId(), name: "Travel & Outdoor" },
-    { id: new ObjectId(), name: "Health & Wellness" },
-    { id: new ObjectId(), name: "Business & Professional" },
-    { id: new ObjectId(), name: "Science & Tech" },
-    { id: new ObjectId(), name: "Fashion & Beauty" },
-    { id: new ObjectId(), name: "Home & Lifestyle" },
-    { id: new ObjectId(), name: "Hobbies & Special Interest" },
-    { id: new ObjectId(), name: "Government & Politics" },
-    { id: new ObjectId(), name: "Other" },
-  ];
 
   /**
    * Make an instance of Tagging.
    */
-  constructor(tagCollectionName: string, moodCollectionName: string, eventCollectionName: string, userCollectionName: string) {
-    this.events = new DocCollection<EventDoc>(eventCollectionName);
+  predefinedMoods: { id: ObjectId; name: string }[];
+  predefinedCategories: { id: ObjectId; name: string }[];
+
+  constructor() {
+    this.predefinedCategories = [
+      { id: new ObjectId(), name: "Music & Concerts" },
+      { id: new ObjectId(), name: "Fitness & Wellness" },
+      { id: new ObjectId(), name: "Arts & Crafts" },
+      { id: new ObjectId(), name: "Food & Drink" },
+      { id: new ObjectId(), name: "Outdoor & Adventure" },
+      { id: new ObjectId(), name: "Social & Networking" },
+      { id: new ObjectId(), name: "Workshops & Classes" },
+      { id: new ObjectId(), name: "Sports & Fitness" },
+      { id: new ObjectId(), name: "Film & Theater" },
+      { id: new ObjectId(), name: "Tech & Innovation" },
+      { id: new ObjectId(), name: "Community & Volunteering" },
+      { id: new ObjectId(), name: "Travel & Outdoor" },
+      { id: new ObjectId(), name: "Health & Wellness" },
+      { id: new ObjectId(), name: "Business & Professional" },
+      { id: new ObjectId(), name: "Science & Tech" },
+      { id: new ObjectId(), name: "Fashion & Beauty" },
+      { id: new ObjectId(), name: "Home & Lifestyle" },
+      { id: new ObjectId(), name: "Hobbies & Special Interest" },
+      { id: new ObjectId(), name: "Government & Politics" },
+      { id: new ObjectId(), name: "Other" },
+    ];
+    this.predefinedMoods = [
+        { id: new ObjectId(), name: "Music & Concerts" },
+        { id: new ObjectId(), name: "Fitness & Wellness" },
+        { id: new ObjectId(), name: "Arts & Crafts" },
+        { id: new ObjectId(), name: "Food & Drink" },
+        { id: new ObjectId(), name: "Outdoor & Adventure" },
+        { id: new ObjectId(), name: "Social & Networking" },
+        { id: new ObjectId(), name: "Workshops & Classes" },
+        { id: new ObjectId(), name: "Sports & Fitness" },
+        { id: new ObjectId(), name: "Film & Theater" },
+        { id: new ObjectId(), name: "Tech & Innovation" },
+        { id: new ObjectId(), name: "Community & Volunteering" },
+        { id: new ObjectId(), name: "Travel & Outdoor" },
+        { id: new ObjectId(), name: "Health & Wellness" },
+        { id: new ObjectId(), name: "Business & Professional" },
+        { id: new ObjectId(), name: "Science & Tech" },
+        { id: new ObjectId(), name: "Fashion & Beauty" },
+        { id: new ObjectId(), name: "Home & Lifestyle" },
+        { id: new ObjectId(), name: "Hobbies & Special Interest" },
+        { id: new ObjectId(), name: "Government & Politics" },
+        { id: new ObjectId(), name: "Other" },
+      ];
   }
 
   // /**
@@ -123,34 +125,35 @@ export default class TaggingConcept {
   /**
    * Get all predefined moods
    */
-  async setMoods(): Promise<{ id: ObjectId; name: string }[]> {
-    return this.predefinedMoods.map((mood) => ({ id: mood.moodid, name: mood.name }));
+  async setMoods(){
+    return this.predefinedMoods
   }
+  
 
   /**
    * Get all predefined categories
    */
-  async setCategories(): Promise<{ id: ObjectId; name: string }[]> {
-    return this.predefinedCategories.map((category) => ({ id: category.id, name: category.name }));
+  async setCategories(){
+    return this.predefinedCategories
   }
 
   /**
    * retrieve a mood by its id ex use case, when user is clicking through a list of moods to filter events associated with that mood
    */
 
-  async getMoodById(moodId: ObjectId): Promise<{ id: ObjectId; name: string }> {
-    const mood = this.predefinedMoods.find((m) => m.moodid.equals(moodId));
-    if (!mood) throw new NotFoundError(`Mood ${moodId} does not exist!`);
-    return { id: mood.moodid, name: mood.name };
-  }
+  // async getMoodById(moodId: ObjectId): Promise<{ id: ObjectId; name: string }> {
+  //   const mood = this.predefinedMoods.find((m) => m.moodid.equals(moodId));
+  //   if (!mood) throw new NotFoundError(`Mood ${moodId} does not exist!`);
+  //   return { id: mood.moodid, name: mood.name };
+  // }
 
   /**
    * retrieve a category by its id ex use case, when user is clicking through a list of categories to filter events associated with that category
-   */
-  async getCategoryById(categoryId: ObjectId): Promise<{ id: ObjectId; name: string }> {
-    const category = this.predefinedCategories.find((c) => c.id.equals(categoryId));
-    if (!category) throw new NotFoundError(`Category ${categoryId} does not exist!`);
-    return { id: category.id, name: category.name };
+  //  */
+  // async getCategoryById(categoryId: ObjectId): Promise<{ id: ObjectId; name: string }> {
+  //   const category = this.predefinedCategories.find((c) => c.id.equals(categoryId));
+  //   if (!category) throw new NotFoundError(`Category ${categoryId} does not exist!`);
+  //   return { id: category.id, name: category.name };
 
     // /**
     //  * Lookup events based on user's mood
@@ -174,4 +177,4 @@ export default class TaggingConcept {
     //   return events;
     // }
   }
-}
+
