@@ -50,6 +50,13 @@ class Routes {
   }
 
 
+  //tagging 
+  //get all categories
+  @Router.get("/categories")
+  async getCategories(id: string, name: string) {
+    return await Tagging.setCategories();
+  }
+  
 
 
   //RSVPing concept
@@ -286,10 +293,10 @@ class Routes {
 
   //tagging concept
 
-  @Router.get("categories")
-  async getCategories(category: string) {
-    return await Tagging.setCategories();
-  }
+  // @Router.get("categories")
+  // async getCategories(category: string) {
+  //   return await Tagging.setCategories();
+  // }
 
   // Tag an event with a category
   // @Router.post("/events/:eventId/tags")
