@@ -15,7 +15,7 @@ import Responses from "./responses";
 class Routes {
 
 
-  //eventing concept
+  //EVENTING CONCEPT 
   @Router.post("/events")
   async create(session: SessionDoc, title: string, description: string, category: ObjectId, moodTag: ObjectId, capacity: number,  location: string, date: Date) {
     const user = Sessioning.getUser(session);
@@ -49,12 +49,14 @@ class Routes {
     return await Eventing.delete(oid);
   }
 
+
+  //TAGGING CONCEPT(REVISIT WORKING ON)
   //post the list of predefined categories
   @Router.get("/categories")
   async getCategories(req: any, res: any) {
     const categories: any = await Responses.categories(Tagging);
     res.json(categories);}
-    
+
 //get list of predefined moods //not work
   @Router.get("/moods")
   async getMoods(req: any, res: any) {
@@ -62,13 +64,13 @@ class Routes {
       res.json(moods);
   }
 
-  //RSVPing concept 
-  //list all RSVPs
-  @Router.get("/rsvps/:userRSVPid")
-  async getRSVPsforUser() {
-    return RSVPing.rsvps;
+  //RSVPING CONCEPT  
+  // //list all RSVPs
+  // @Router.get("/rsvps/:userRSVPid")
+  // async getRSVPsforUser() {
+  //   return RSVPing.rsvps;
     
-  }
+  // }
 
 // RSVP to an event
   @Router.post("/rsvps/:eventid")
