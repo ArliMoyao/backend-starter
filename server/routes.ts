@@ -49,24 +49,36 @@ class Routes {
     return await Eventing.delete(oid);
   }
 
-  //posr the list of predefined categories
+  //post the list of predefined categories
   @Router.get("/categories")
   async getCategories(req: any, res: any) {
     const categories: any = await Responses.categories(Tagging);
     res.json(categories);}
-//get list of predefined moods
+    
+//get list of predefined moods //not work
   @Router.get("/moods")
   async getMoods(req: any, res: any) {
       const moods: any = await Responses.moods(Tagging);
       res.json(moods);
   }
 
-  //RSVPing concept
+  //RSVPing concept 
   //list all RSVPs
-  @Router.get("/rsvps")
-  async getRSVPs() {
+  @Router.get("/rsvps/:userRSVPid")
+  async getRSVPsforUser() {
     return RSVPing.rsvps;
+    
   }
+
+// RSVP to an event
+  @Router.post("/rsvps/:eventid")
+  async rsvpToEvent(session: SessionDoc, id: string) {
+    const user = Sessioning.getUser(session);
+    const eventId = new ObjectId(id);
+    return await RSVPing.rsvpForEvent(user, eventId);
+  }
+
+
 
   //when user rsvp to an event (sync user auth, session, rsvp, event)
   //step 1: authenticate and validate the user
@@ -119,12 +131,7 @@ class Routes {
   //   return { msg: rsvp.msg };
   // }
 
-  //get details of a specific rsvp
-  @Router.get("/rsvps/:id")
-  async getRSVP(user: string, event: string) {
-    return RSVPing.getRSVPDetails(new ObjectId(user), new ObjectId(event));
-  }
-
+ 
   //streaks concept
 
   //get user's streak details

@@ -1,8 +1,7 @@
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotAllowedError, NotFoundError, CapacityError } from "./errors";
-
-
+import { EventDoc as ImportedEventDoc } from "./events";
 
 // RSVPing Concept
 export interface RSVPDoc extends BaseDoc {
@@ -12,7 +11,7 @@ export interface RSVPDoc extends BaseDoc {
   }
   
 
-  export interface EventDoc extends BaseDoc {
+  export interface LocalEventDoc extends BaseDoc {
     capacity: number;
     rsvpList: ObjectId[]; // List of users who have RSVP'd
   }
@@ -23,12 +22,12 @@ export interface RSVPDoc extends BaseDoc {
 
   export default class RSVPConcept {
     public readonly rsvps: DocCollection<RSVPDoc>;
-    public readonly events: DocCollection<EventDoc>;
+    public readonly events: DocCollection<LocalEventDoc>;
     //initialize the collections for RSVPs and events
   
   constructor(collectionName: string) {
     this.rsvps = new DocCollection<RSVPDoc>(collectionName);
-    this.events = new DocCollection<EventDoc>(collectionName + "_events");
+    this.events = new DocCollection<LocalEventDoc>("events");
     }
 
     //Action: RSVP to an event
@@ -52,6 +51,7 @@ export interface RSVPDoc extends BaseDoc {
             await this.rsvps.createOne({ user, event: eventId, status: true });
             return { msg: "RSVP successfully created!" };
             }
+            
 
     //Action: Cancel RSVP to an event
     async cancelRSVP(user: ObjectId, eventId: ObjectId) {
@@ -75,7 +75,6 @@ export interface RSVPDoc extends BaseDoc {
 
     }
 
-
     //Action: Check if the user has RSVP'd for an event
     async hasRSVPd(user: ObjectId, eventId: ObjectId) {
         const rsvp = await this.rsvps.readOne({ user, event: eventId });
@@ -93,14 +92,7 @@ export interface RSVPDoc extends BaseDoc {
         const rsvps = await this.rsvps.readMany({ user, status: true });
         return rsvps.map((rsvp) => rsvp.event);
     }
-
-    //get details of a specfic rsvp for a user
-    async getRSVPDetails(user: ObjectId, eventId: ObjectId) {
-        const rsvp = await this.rsvps.readOne({ user, event: eventId });
-        return rsvp;
-    }
-
-    
+ 
   }
 
 

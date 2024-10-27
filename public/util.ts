@@ -125,10 +125,11 @@ const operations: Operation[] = [
     fields: { id: "input" },
   },
   {
-    name: "RSVP to Event",
-    endpoint: "/api/events/:id/rsvp",
+    name: "RSVP to an Event",
+    endpoint: "/api/rsvps/:eventid",
     method: "POST",
-    fields: { id: "input" },
+    fields: {
+      eventid: "input" }
   },
   {
     name: "Cancel RSVP",
