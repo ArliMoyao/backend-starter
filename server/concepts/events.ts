@@ -72,4 +72,8 @@ export default class EventsConcept {
       throw new NotAllowedError("You are not the host of this event.");
     }
   }
+
+  async getEventById(_id: ObjectId) {
+    return await this.events.readOne({ _id });
+  }
 }

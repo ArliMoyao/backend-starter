@@ -49,6 +49,10 @@ class Routes {
     return await Eventing.delete(oid);
   }
 
+  @Router.get("/events/:id")
+  async getEventDetails(id: string) {
+    return await Eventing.getEventById(new ObjectId(id));
+  }
 
   //TAGGING CONCEPT(REVISIT WORKING ON)
   //post the list of predefined categories

@@ -124,6 +124,13 @@ const operations: Operation[] = [
     method: "DELETE",
     fields: { id: "input" },
   },
+
+  {
+    name: "Get Event by ID",
+    endpoint: "/api/events/:id",
+    method: "GET",
+    fields: { id: "input" },
+  },
   {
     name: "RSVP to an Event",
     endpoint: "/api/rsvps/:eventid",
