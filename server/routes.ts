@@ -74,12 +74,14 @@ class Routes {
 
 // RSVP to an event
   @Router.post("/rsvps/:eventid")
-  async rsvpToEvent(session: SessionDoc, id: string) {
+  async createRSVP(session: SessionDoc, id: string, status: boolean) {
     const user = Sessioning.getUser(session);
     const eventId = new ObjectId(id);
-    return await RSVPing.rsvpForEvent(user, eventId);
+    return await RSVPing.createRSVP(user, eventId, status); ;
   }
 
+
+ 
 
 
   //when user rsvp to an event (sync user auth, session, rsvp, event)

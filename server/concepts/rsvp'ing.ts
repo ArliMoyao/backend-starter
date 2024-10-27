@@ -30,23 +30,38 @@ export interface RSVPDoc extends BaseDoc {
         this.events = new DocCollection<LocalEventDoc>("events");
       }
     
-      async rsvpForEvent(user: ObjectId, eventId: ObjectId) {
-        const event = await this.events.readOne({ _id: eventId });
-        if (!event) throw new NotFoundError(`Event ${eventId} not found`);
-    
-        if (event.rsvpList.length >= event.capacity) {
-          throw new CapacityError("Event is full");
-        }
-    
-        const existingRSVP: RSVPDoc | null = await this.rsvps.readOne({ user, event: eventId });
-        if (existingRSVP && existingRSVP.status) {
-          throw new NotAllowedError(`User ${user} has already RSVP'd for event ${eventId}!`);
-        }
-    
-        await this.events.partialUpdateOne({ _id: eventId }, { rsvpList: [...event.rsvpList, user] });
-        await this.rsvps.createOne({ user, event: eventId, status: true });
-        return { msg: "RSVP successfully created!" };
+
+
+      async createRSVP(user: ObjectId, event: ObjectId, status: boolean) {
+       
+        if (status === false) {
+       
+          status = true;
+        } 
+        const _id = await this.rsvps.createOne({ user, event, status });
+        return { msg: "RSVP successfully created!", rsvp: await this.rsvps.readOne({ _id }) };
       }
+    
+
+
+
+      // async rsvpForEvent(user: ObjectId, eventId: ObjectId) {
+      //   const event = await this.events.readOne({ _id: eventId });
+      //   if (!event) throw new NotFoundError(`Event ${eventId} not found`);
+    
+      //   if (event.rsvpList.length >= event.capacity) {
+      //     throw new CapacityError("Event is full");
+      //   }
+    
+      //   const existingRSVP: RSVPDoc | null = await this.rsvps.readOne({ user, event: eventId });
+      //   if (existingRSVP && existingRSVP.status) {
+      //     throw new NotAllowedError(`User ${user} has already RSVP'd for event ${eventId}!`);
+      //   }
+    
+      //   await this.events.partialUpdateOne({ _id: eventId }, { rsvpList: [...event.rsvpList, user] });
+      //   await this.rsvps.createOne({ user, event: eventId, status: true });
+      //   return { msg: "RSVP successfully created!" };
+      // }
     }
     // //Action: RSVP to an event
     // async rsvpForEvent(user: ObjectId, eventId: ObjectId) {
