@@ -11,10 +11,10 @@ export interface RSVPDoc extends BaseDoc {
   }
   
 
-  export interface LocalEventDoc extends BaseDoc {
-    capacity: number;
-    rsvpList: ObjectId[]; // List of users who have RSVP'd
-  }
+  // export interface LocalEventDoc extends BaseDoc {
+  //   capacity: number;
+  //   rsvpList: ObjectId[]; // List of users who have RSVP'd
+  // }
   
   /**
    * Concept: RSVPing [RSVP, Event]
@@ -23,11 +23,11 @@ export interface RSVPDoc extends BaseDoc {
 
     export default class RSVPConcept {
       public readonly rsvps: DocCollection<RSVPDoc>;
-      public readonly events: DocCollection<LocalEventDoc>;
+      //public readonly events: DocCollection<LocalEventDoc>;
     
       constructor(collectionName: string) {
         this.rsvps = new DocCollection<RSVPDoc>(collectionName);
-        this.events = new DocCollection<LocalEventDoc>("events");
+       // this.events = new DocCollection<LocalEventDoc>("events");
       }
     
 

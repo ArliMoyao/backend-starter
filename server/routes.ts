@@ -78,12 +78,14 @@ class Routes {
 
 // RSVP to an event
   @Router.post("/rsvps/:eventid")
-  async createRSVP(session: SessionDoc, id: ObjectId, status: boolean) {
+  async createRSVP(session: SessionDoc, eventid: string, status: boolean) {
     const user = Sessioning.getUser(session);
-    const event = await Eventing.getEventById(new ObjectId(id));
+    const event = await Eventing.getEventById(new ObjectId(eventid));
+    
     if (!event) {
       throw new Error("Event not found");
     }
+  
     return await RSVPing.createRSVP(user, event._id, status);
   }
 
