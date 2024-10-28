@@ -35,26 +35,26 @@ export default class UpvotingConcept {
     //     return { msg: "Upvote successfully created!", upvote: await this.upvotes.readOne({ _id }) };
     // }
 
-    async createUpvote(userId: ObjectId, eventId: ObjectId, upVoteCount: number) {
+  async createUpvote(userId: ObjectId, eventId: ObjectId, upVoteCount: number) {
         const existingUpvote = await this.upvotes.readOne({ userId, eventId });
+
         if (existingUpvote) {
             throw new NotAllowedError(`User ${userId} has already upvoted this event.`);
         }
         const _id = await this.upvotes.createOne({ userId, eventId, upVoteCount });
+       const updateVoteCount = await this.upvotes.partialUpdateOne({ eventId }, { $inc: { upVoteCount: 1 } } as Partial<UpvoteDoc>);
         return { msg: "Upvote successfully created!", upvote: await this.upvotes.readOne({ _id }) };
     }
 
-   
-  async incrementUpvoteCount(eventId: ObjectId) {
-    const result = await this.upvotes.incrementOne(
-      { eventId },
-      { $inc: { upVoteCount: 1 } }
-    );
-    if (result.matchedCount === 0) {
-      throw new NotFoundError(`Event ${eventId} does not exist for incrementing upvotes.`);
-    }
-    return { msg: "Upvote count incremented successfully!" };
-  }
+  // async incrementUpvoteCount(eventId: ObjectId) {
+  //   const result = await this.upvotes.incrementOne(
+  //     { eventId },
+  //     { $inc: { upVoteCount: 1 } });
+  //   if (result.matchedCount === 0) {
+  //     throw new NotFoundError(`Event ${eventId} does not exist for incrementing upvotes.`);
+  //   }
+  //   return { msg: "Upvote count incremented successfully!" };
+  // }
       
     // async removeUpvote(userId: ObjectId, eventId: ObjectId) { 
     //     const upvote = await this.upvotes.popOne({ userId, eventId });
