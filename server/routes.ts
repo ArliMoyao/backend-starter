@@ -122,24 +122,29 @@ class Routes {
     return Upvoting.upvotes;
   }
 
+  // @Router.post("/upvotes/:eventid")
+  // async upvote(session: SessionDoc, eventid: string) {
+  //   const user = Sessioning.getUser(session);
+  //   const eventId = new ObjectId(eventid);
+  //   await Upvoting.createUpvote(user, eventId , 0);
+  //   return await Upvoting.incrementUpvoteCount(eventId);
+  // }
+
+  //   // Remove an upvote from an event
+  //   @Router.delete("/upvotes/:eventid")
+  //   async removeUpvote(session: SessionDoc, eventid: string) {
+  //     const user = Sessioning.getUser(session);
+  //     const eventId = new ObjectId(eventid);
+  //     return await Upvoting.removeUpvote(user, eventId);
+  //   }
+  
+
   @Router.post("/upvotes/:eventid")
   async upvote(session: SessionDoc, eventid: string) {
     const user = Sessioning.getUser(session);
     const eventId = new ObjectId(eventid);
-    await Upvoting.createUpvote(user, eventId , 0);
-    return await Upvoting.incrementUpvoteCount(eventId);
+    return await Upvoting.createUpvote(user, eventId, 0);
   }
-
-    // Remove an upvote from an event
-    @Router.delete("/upvotes/:eventid")
-    async removeUpvote(session: SessionDoc, eventid: string) {
-      const user = Sessioning.getUser(session);
-      const eventId = new ObjectId(eventid);
-      return await Upvoting.removeUpvote(user, eventId);
-    }
-  
-
-  
 
   //when user rsvp to an event (sync user auth, session, rsvp, event)
   //step 1: authenticate and validate the user
