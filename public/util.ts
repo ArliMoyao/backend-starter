@@ -143,7 +143,7 @@ const operations: Operation[] = [
   },
   {
     name: "Cancel RSVP",
-    endpoint: "/api/rsvps/:eventid",
+    endpoint: "/api/rsvps/:rsvpid",
     method: "DELETE",
     fields: { rsvpid: "input" },
   },
@@ -191,7 +191,7 @@ const operations: Operation[] = [
   },
   {
     name: "Remove Upvote from Event",
-    endpoint: "/api/upvotes/:eventid",
+    endpoint: "/api/upvotes/:upvoteid",
     method: "DELETE",
     fields: { eventid: "input" },
   },

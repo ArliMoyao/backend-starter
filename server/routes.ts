@@ -94,7 +94,7 @@ class Routes {
     return RSVPing.getRSVPS();
   }
 
- @Router.delete("/rsvps/:eventid")
+ @Router.delete("/rsvps/:rsvpid")
   async deleteRSVP(session: SessionDoc, rsvpid: string) {
       const user = Sessioning.getUser(session);
       const oid = new ObjectId(rsvpid);
@@ -127,14 +127,12 @@ class Routes {
     return { msg: "Upvote successfully created!" };
   }
 
-  @Router.delete("/upvotes/:eventid")
+  @Router.delete("/upvotes/:upvoteid")
   async removeUpvote(session: SessionDoc, eventid: string) {
     const user = Sessioning.getUser(session);
     const eventId = new ObjectId(eventid);
     return await Upvoting.deleteUpvote(eventId);
   }
-
-
 
 
   //   // Remove an upvote from an event
