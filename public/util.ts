@@ -184,9 +184,16 @@ const operations: Operation[] = [
     fields: { eventid: "input" },
   },
   {
-    name: "Upvote Event",
+    name: "Create Upvote for Event",
     endpoint: "/api/upvotes/:eventid",
     method: "POST",
+    fields: { eventid: "input" },
+  },
+
+  {
+    name: "Increment Upvote Count",
+    endpoint: "/api/upvotes/:eventid",
+    method: "PATCH",
     fields: { eventid: "input" },
   },
   {
