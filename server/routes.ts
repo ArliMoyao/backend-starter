@@ -100,10 +100,7 @@ class Routes {
       const oid = new ObjectId(rsvpid);
       return await RSVPing.deleteRSVP(oid);
     }
-
-  // 
-
-  
+    
   @Router.post("/tags/initialize")
   async initializeTags() {
     await Tagging.initializeTags();
@@ -136,6 +133,10 @@ class Routes {
     const eventId = new ObjectId(eventid);
     return await Upvoting.deleteUpvote(user, eventId);
   }
+
+
+
+
   //   // Remove an upvote from an event
   //   @Router.delete("/upvotes/:eventid")
   //   async removeUpvote(session: SessionDoc, eventid: string) {

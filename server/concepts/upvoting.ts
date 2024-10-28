@@ -26,15 +26,6 @@ export default class UpvotingConcept {
         this.upvotes = new DocCollection<UpvoteDoc>(collectionName);
       }
 
-    //   async createUpvote(userId: ObjectId, eventId: ObjectId, upVoteCount: number) {
-    //     const existingUpvote = await this.upvotes.readOne({ userId, eventId });
-    //     if (existingUpvote) {
-    //         throw new NotAllowedError(`User ${userId} has already upvoted this event.`);
-    //     }
-    //     const _id = await this.upvotes.createOne({ userId, eventId, upVoteCount });
-    //     return { msg: "Upvote successfully created!", upvote: await this.upvotes.readOne({ _id }) };
-    // }
-
   async createUpvote(userId: ObjectId, eventId: ObjectId, upVoteCount: number) {
         const existingUpvote = await this.upvotes.readOne({ userId, eventId }); 
         if (existingUpvote) {
@@ -44,12 +35,21 @@ export default class UpvotingConcept {
         return { msg: "Upvote successfully created!", upvote: await this.upvotes.readOne({ _id }) };
     }
 
-  async deleteUpvote(userId: ObjectId, eventId: ObjectId) {
-    const upvote = await this.upvotes.popOne({ userId, eventId });
-    if (!upvote) {
-        throw new NotFoundError(`Upvote ${userId} does not exist!`);
-    }
-    return { msg: "Upvote removed successfully!" };
+  async deleteUpvote(_id:ObjectId) {
+    await this.upvotes.deleteOne({_id});
+    return {msg: "Upvote successfully deleted", upvote: await this.upvotes.readOne({_id})};
+  }
+
+
+
+
+    // const upvote = await this.upvotes.popOne({ userId, eventId });
+    // if (!upvote) {
+    //     throw new NotFoundError(`Upvote ${userId} does not exist!`);
+    // }
+    // return { msg: "Upvote removed successfully!" };
+
+  
 
   // async incrementUpvoteCount(eventId: ObjectId) {
   //   const result = await this.upvotes.incrementOne(
@@ -143,4 +143,4 @@ export default class UpvotingConcept {
     //   ) {
     //     super("User {0} has not upvoted event {1}!", userId, eventId);
     //   }
-    }    }
+    }    
