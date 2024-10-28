@@ -95,10 +95,12 @@ class Routes {
   }
 
  @Router.delete("/rsvps/:eventid")
-  async deleteRSVP(rsvpID: string) {
-    return await RSVPing.deleteRSVP(new ObjectId(rsvpID));
-  }
-
+  async deleteRSVP(session: SessionDoc, eventid: string) {
+      const user = Sessioning.getUser(session);
+      const oid = new ObjectId(eventid);
+      await Eventing.assertHostIsUser(oid, user);
+      return await Eventing.delete(oid);
+    }
 
   //when user rsvp to an event (sync user auth, session, rsvp, event)
   //step 1: authenticate and validate the user

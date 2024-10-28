@@ -46,6 +46,15 @@ export interface RSVPDoc extends BaseDoc {
         return { msg: "RSVP successfully deleted!", rsvp: await this.rsvps.readOne({ _id }) };
       }
   
+      async assertHostIsUser(_id: ObjectId, user: ObjectId) {
+        const event = await this.rsvps.readOne({ _id });
+        if (!event) {
+          throw new NotFoundError(`Event ${_id} does not exist!`);
+        }
+        if (event.user.toString() !== user.toString()) {
+          throw new NotAllowedError("You are not the host of this event.");
+        }
+      }
       // async rsvpForEvent(user: ObjectId, eventId: ObjectId) {
       //   const event = await this.events.readOne({ _id: eventId });
       //   if (!event) throw new NotFoundError(`Event ${eventId} not found`);
