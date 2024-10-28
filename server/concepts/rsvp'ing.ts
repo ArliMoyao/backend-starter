@@ -40,14 +40,15 @@ export interface RSVPDoc extends BaseDoc {
       }
     
       async getRSVPs() {  
-        return await this.rsvps.readMany({}, { sort: { _id: -1 } });
+        return await this.rsvps.readMany({});
       }
 
       async deleteRSVP(user: ObjectId, event: ObjectId, status: boolean) {
         status = false;
         const rsvp = await this.rsvps.readOne({ user, event, status });
-        if (!rsvp) throw new NotFoundError(`RSVP ${user} for event ${event} not found`);
-    
+        if (!rsvp) {
+          throw new NotFoundError("RSVP not found");
+        }
         await this.rsvps.deleteOne({ _id: rsvp._id });
         return { msg: "RSVP successfully deleted!" };
       }
