@@ -1,4 +1,4 @@
-import { ObjectId, Collection } from "mongodb";
+import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotFoundError } from "./errors";
 
