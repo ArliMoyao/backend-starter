@@ -98,7 +98,6 @@ class Routes {
   async deleteRSVP(session: SessionDoc, rsvpid: string) {
       const user = Sessioning.getUser(session);
       const oid = new ObjectId(rsvpid);
-      await RSVPing.assertHostIsUser(oid, user);
       return await RSVPing.deleteRSVP(oid);
     }
 

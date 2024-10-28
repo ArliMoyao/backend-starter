@@ -1,11 +1,11 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, Collection } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotFoundError } from "./errors";
 
 // Define the interfaces for Tags, Moods, and Events
 export interface TagDoc extends BaseDoc {
-  userMood: ObjectId;
-  eventCategory: ObjectId;
+  id: ObjectId;
+  name: string;
 }
 export interface EventDoc extends BaseDoc {
   host: ObjectId;
@@ -26,11 +26,7 @@ export default class TaggingConcept {
   /**
    * Make an instance of Tagging.
    */
-  predefinedMoods: { id: ObjectId; name: string }[];
-  predefinedCategories: { id: ObjectId; name: string }[];
-
-  constructor() {
-    this.predefinedCategories = [
+      private predefinedTags: Partial <TagDoc> []= [
       { id: new ObjectId(), name: "Music & Concerts" },
       { id: new ObjectId(), name: "Fitness & Wellness" },
       { id: new ObjectId(), name: "Arts & Crafts" },
@@ -52,7 +48,8 @@ export default class TaggingConcept {
       { id: new ObjectId(), name: "Government & Politics" },
       { id: new ObjectId(), name: "Other" },
     ];
-    this.predefinedMoods = [
+
+    private predefinedMoods: Partial<TagDoc>[]= [
         { id: new ObjectId(), name: "Music & Concerts" },
         { id: new ObjectId(), name: "Fitness & Wellness" },
         { id: new ObjectId(), name: "Arts & Crafts" },
@@ -74,7 +71,28 @@ export default class TaggingConcept {
         { id: new ObjectId(), name: "Government & Politics" },
         { id: new ObjectId(), name: "Other" },
       ];
+
+
+      public readonly tags: DocCollection<TagDoc>;
+      constructor(collectionName: string) {
+        this.tags = new DocCollection<TagDoc>("tags");
+      }
+
+      async initializeTags() {
+        const existingTags = await this.tags.readMany({});
+        if (existingTags.length === 0) {
+          await this.tags.createMany(this.predefinedTags);
+        }
+      }
+
+      /**
+       * Get all predefined tags
+       */
+      async getTags() {
+        return this.predefinedTags;
   }
+
+    }
 
   // /**
   //  * Tags an event with a single mood tag
@@ -124,19 +142,7 @@ export default class TaggingConcept {
 
   /**
    * Get all predefined moods
-   */
-  async setMoods(){
-    return this.predefinedMoods
-  }
-  
-
-  /**
-   * Get all predefined categories
-   */
-  async setCategories(){
-    return this.predefinedCategories
-  }
-
+ 
   /**
    * retrieve a mood by its id ex use case, when user is clicking through a list of moods to filter events associated with that mood
    */
@@ -175,6 +181,6 @@ export default class TaggingConcept {
     // async filterEventsByCategory(categoryId: ObjectId): Promise<EventDoc[]> {
     //   const events = await this.events.readMany({ category: categoryId });
     //   return events;
-    // }
-  }
+    //}
+  
 
