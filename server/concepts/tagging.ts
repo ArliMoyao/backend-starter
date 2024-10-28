@@ -78,21 +78,21 @@ export default class TaggingConcept {
         this.tags = new DocCollection<TagDoc>("tags");
       }
 
-      async initializeTags() {
-        const existingTags = await this.tags.readMany({});
-        if (existingTags.length === 0) {
-          await this.tags.createMany(this.predefinedTags);
-        }
-      }
+      // async initializeTags() {
+      //   const existingTags = await this.tags.readMany({});
+      //   if (existingTags.length === 0) {
+      //     await this.tags.createMany(this.predefinedTags);
+      //   }
+      // }
 
-      /**
-       * Get all predefined tags
-       */
-      async getTags() {
-        return this.tags.readMany({});
+      // /**
+      //  * Get all predefined tags
+      //  */
+      // async getTags() {
+      //   return this.tags.readMany({});
   }
 
-    }
+  
 
   // /**
   //  * Tags an event with a single mood tag
