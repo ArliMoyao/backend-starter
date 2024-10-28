@@ -125,12 +125,19 @@ class Routes {
   @Router.post("/upvotes/:eventid")
   async upvote(session: SessionDoc, eventid: string) {
     const user = Sessioning.getUser(session);
-    const event = await Eventing.getEventById(new ObjectId(eventid));
-    if (!event) {
-      throw new Error("Event not found");
-    }
-    return await Upvoting.createUpvote(user, event._id, 1);
+    const eventId = new ObjectId(eventid);
+    await Upvoting.createUpvote(user, eventId , 0);
+    return await Upvoting.incrementUpvoteCount(eventId);
   }
+
+    // Remove an upvote from an event
+    @Router.delete("/upvotes/:eventid")
+    async removeUpvote(session: SessionDoc, eventid: string) {
+      const user = Sessioning.getUser(session);
+      const eventId = new ObjectId(eventid);
+      return await Upvoting.removeUpvote(user, eventId);
+    }
+  
 
   
 

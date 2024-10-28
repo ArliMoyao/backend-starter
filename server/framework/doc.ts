@@ -13,6 +13,7 @@ import {
   ReplaceOptions,
   UpdateResult,
   WithoutId,
+  UpdateFilter,
 } from "mongodb";
 
 import db from "../db";
@@ -61,6 +62,9 @@ export default class DocCollection<Schema extends BaseDoc> {
     safe.dateCreated = new Date();
     safe.dateUpdated = new Date();
     return (await this.collection.insertOne(safe as OptionalUnlessRequiredId<Schema>)).insertedId;
+  }
+  async incrementOne(filter: Filter<Schema>, update: UpdateFilter<Schema>): Promise<UpdateResult> {
+    return await this.collection.updateOne(filter, update);
   }
 
   /**
