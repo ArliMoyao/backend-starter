@@ -29,11 +29,8 @@ export interface RSVPDoc extends BaseDoc {
         this.rsvps = new DocCollection<RSVPDoc>(collectionName);
        // this.events = new DocCollection<LocalEventDoc>("events");
       }
-    
-
 
       async createRSVP(user: ObjectId, event: ObjectId, status: boolean) {
-       
         status = true;
         const _id = await this.rsvps.createOne({ user, event, status });
         return { msg: "RSVP successfully created!", rsvp: await this.rsvps.readOne({ _id }) };
@@ -41,12 +38,12 @@ export interface RSVPDoc extends BaseDoc {
     
      
       async getRSVPS() {
-        // Returns all events! You might want to page for better client performance
         return await this.rsvps.readMany({}, { sort: { _id: -1 } });
       }
       async deleteRSVP(_id: ObjectId) {
+        console.log(_id);
         await this.rsvps.deleteOne({ _id });
-        return { msg: "RSVP successfully deleted!" };
+        return { msg: "RSVP successfully deleted!", rsvp: await this.rsvps.readOne({ _id }) };
       }
   
       // async rsvpForEvent(user: ObjectId, eventId: ObjectId) {
