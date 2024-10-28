@@ -36,13 +36,11 @@ export default class UpvotingConcept {
     // }
 
   async createUpvote(userId: ObjectId, eventId: ObjectId, upVoteCount: number) {
-        const existingUpvote = await this.upvotes.readOne({ userId, eventId });
-
+        const existingUpvote = await this.upvotes.readOne({ userId, eventId }); 
         if (existingUpvote) {
             throw new NotAllowedError(`User ${userId} has already upvoted this event.`);
         }
         const _id = await this.upvotes.createOne({ userId, eventId, upVoteCount });
-       const updateVoteCount = await this.upvotes.partialUpdateOne({ eventId }, { $inc: { upVoteCount: 1 } } as Partial<UpvoteDoc>);
         return { msg: "Upvote successfully created!", upvote: await this.upvotes.readOne({ _id }) };
     }
 

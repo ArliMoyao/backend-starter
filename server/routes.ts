@@ -122,13 +122,13 @@ class Routes {
     return Upvoting.upvotes;
   }
 
-  // @Router.post("/upvotes/:eventid")
-  // async upvote(session: SessionDoc, eventid: string) {
-  //   const user = Sessioning.getUser(session);
-  //   const eventId = new ObjectId(eventid);
-  //   await Upvoting.createUpvote(user, eventId , 0);
-  //   return await Upvoting.incrementUpvoteCount(eventId);
-  // }
+  @Router.post("/upvotes/:eventid")
+  async upvote(session: SessionDoc, eventid: string) {
+    const user = Sessioning.getUser(session);
+    const eventId = new ObjectId(eventid);
+    await Upvoting.createUpvote(user, eventId , 1);
+    return { msg: "Upvote successfully created!" };
+  }
 
   //   // Remove an upvote from an event
   //   @Router.delete("/upvotes/:eventid")
@@ -137,24 +137,16 @@ class Routes {
   //     const eventId = new ObjectId(eventid);
   //     return await Upvoting.removeUpvote(user, eventId);
   //   }
-  
-
-  @Router.post("/upvotes/:eventid")
-  async upvote(session: SessionDoc, eventid: string) {
-    const user = Sessioning.getUser(session);
-    const eventId = new ObjectId(eventid);
-    return await Upvoting.createUpvote(user, eventId, 0);
-  }
 
 
-  //increment an upvote for a given event 
-  @Router.patch("/upvotes/:eventid")
-  async incrementUpvote(session: SessionDoc, eventid: string) {
-    const user = Sessioning.getUser(session);
-    const eventId = new ObjectId(eventid);
-    return await Upvoting.incrementUpvoteCount(eventId);
-  }
-  
+  // //increment an upvote for a given event 
+  // @Router.patch("/upvotes/:eventid")
+  // async incrementUpvote(session: SessionDoc, eventid: string) {
+  //   const user = Sessioning.getUser(session);
+  //   const eventId = new ObjectId(eventid);
+  //   return await Upvoting.incrementUpvoteCount(eventId);
+  // }
+
   //when user rsvp to an event (sync user auth, session, rsvp, event)
   //step 1: authenticate and validate the user
   //step 2: check event capacity is not full
