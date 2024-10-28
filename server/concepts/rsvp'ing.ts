@@ -39,13 +39,13 @@ export interface RSVPDoc extends BaseDoc {
         return { msg: "RSVP successfully created!", rsvp: await this.rsvps.readOne({ _id }) };
       }
     
-      async getRSVPs() {  
-        return await this.rsvps.readMany({});
+     
+      async getRSVPS() {
+        // Returns all events! You might want to page for better client performance
+        return await this.rsvps.readMany({}, { sort: { _id: -1 } });
       }
-
-      async deleteRSVP(rsvpID: ObjectId) {
-        const rsvp = await this.rsvps.readOne({_id: rsvpID}); 
-        await this.rsvps.deleteOne({ _id: rsvpID });
+      async deleteRSVP(_id: ObjectId) {
+        await this.rsvps.deleteOne({ _id });
         return { msg: "RSVP successfully deleted!" };
       }
   

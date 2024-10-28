@@ -143,7 +143,7 @@ const operations: Operation[] = [
     name: "Cancel RSVP",
     endpoint: "/api/rsvps/:eventid",
     method: "DELETE",
-    fields: { eventid: "input" },
+    fields: { rsvpid: "input" },
   },
   {
     name: "Get RSVPs",
