@@ -189,13 +189,6 @@ const operations: Operation[] = [
     method: "POST",
     fields: { eventid: "input" },
   },
-
-  {
-    name: "Increment Upvote Count",
-    endpoint: "/api/upvotes/:eventid",
-    method: "PATCH",
-    fields: { eventid: "input" },
-  },
   {
     name: "Remove Upvote from Event",
     endpoint: "/api/upvotes/:eventid",

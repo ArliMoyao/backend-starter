@@ -130,6 +130,12 @@ class Routes {
     return { msg: "Upvote successfully created!" };
   }
 
+  @Router.delete("/upvotes/:eventid")
+  async removeUpvote(session: SessionDoc, eventid: string) {
+    const user = Sessioning.getUser(session);
+    const eventId = new ObjectId(eventid);
+    return await Upvoting.deleteUpvote(user, eventId);
+  }
   //   // Remove an upvote from an event
   //   @Router.delete("/upvotes/:eventid")
   //   async removeUpvote(session: SessionDoc, eventid: string) {

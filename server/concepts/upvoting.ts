@@ -44,6 +44,13 @@ export default class UpvotingConcept {
         return { msg: "Upvote successfully created!", upvote: await this.upvotes.readOne({ _id }) };
     }
 
+  async deleteUpvote(userId: ObjectId, eventId: ObjectId) {
+    const upvote = await this.upvotes.popOne({ userId, eventId });
+    if (!upvote) {
+        throw new NotFoundError(`Upvote ${userId} does not exist!`);
+    }
+    return { msg: "Upvote removed successfully!" };
+
   // async incrementUpvoteCount(eventId: ObjectId) {
   //   const result = await this.upvotes.incrementOne(
   //     { eventId },
@@ -136,7 +143,4 @@ export default class UpvotingConcept {
     //   ) {
     //     super("User {0} has not upvoted event {1}!", userId, eventId);
     //   }
-    }    
-
-
-    
+    }    }
