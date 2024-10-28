@@ -20,6 +20,6 @@ export const Eventing = new EventConcept("events");
 export const RSVPing = new RSVPConcept("rsvps");
 export const Streaks = new StreakConcept("streaks");
 export const Tagging = new TaggingConcept("tags");
-export const Upvoting = new UpvotingConcept("upvotes", "events");
+export const Upvoting = new UpvotingConcept("upvotes");
 export const Posting = new PostingConcept("posts");
 //export const Friending = new FriendingConcept("friends");

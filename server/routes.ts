@@ -116,6 +116,24 @@ class Routes {
     return await Tagging.getTags();
   }
 
+  //UPVOTING CONCEPT 
+  @Router.get("/upvotes")
+  async getUpvotes() {
+    return Upvoting.upvotes;
+  }
+
+  @Router.post("/upvotes/:eventid")
+  async upvote(session: SessionDoc, eventid: string) {
+    const user = Sessioning.getUser(session);
+    const event = await Eventing.getEventById(new ObjectId(eventid));
+    if (!event) {
+      throw new Error("Event not found");
+    }
+    return await Upvoting.createUpvote(user, event._id, 1);
+  }
+
+  
+
   //when user rsvp to an event (sync user auth, session, rsvp, event)
   //step 1: authenticate and validate the user
   //step 2: check event capacity is not full
@@ -213,26 +231,26 @@ class Routes {
 
   //upvoting concept
 
-  //get the number of upvotes for an event
-  @Router.get("/upvotes/:eventid")
-  async getUpvotes() {
-    return Upvoting.upvotes;
-  }
+  // //get the number of upvotes for an event
+  // @Router.get("/upvotes/:eventid")
+  // async getUpvotes() {
+  //   return Upvoting.upvotes;
+  // }
 
-  //upvote and sync notfications
-  @Router.post("/upvotes/:eventid")
-  async upvote(session: SessionDoc, event: string) {
-    const user = Sessioning.getUser(session);
-    //await Posting.createActionPost(user, new ObjectId(event), "upvote");
-    return await Upvoting.upvote(user, new ObjectId(event));
-  }
+  // //upvote and sync notfications
+  // @Router.post("/upvotes/:eventid")
+  // async upvote(session: SessionDoc, event: string) {
+  //   const user = Sessioning.getUser(session);
+  //   //await Posting.createActionPost(user, new ObjectId(event), "upvote");
+  //   return await Upvoting.upvote(user, new ObjectId(event));
+  // }
 
-  //remove an upvote from an event
-  @Router.delete("/upvotes/:eventid")
-  async removeUpvote(session: SessionDoc, event: string) {
-    const user = Sessioning.getUser(session);
-    return await Upvoting.removeUpvote(user, new ObjectId(event));
-  }
+  // //remove an upvote from an event
+  // @Router.delete("/upvotes/:eventid")
+  // async removeUpvote(session: SessionDoc, event: string) {
+  //   const user = Sessioning.getUser(session);
+  //   return await Upvoting.removeUpvote(user, new ObjectId(event));
+  // }
 
   //get the number of upvotes for an event
 
