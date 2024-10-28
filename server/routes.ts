@@ -91,7 +91,7 @@ class Routes {
 
   @Router.get("/rsvps")
   async getRSVPs() {
-    return RSVPing.rsvps;
+    return RSVPing.getRSVPS();
   }
 
  @Router.delete("/rsvps/:eventid")
