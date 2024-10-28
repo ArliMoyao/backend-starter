@@ -103,7 +103,7 @@ class Routes {
 
   // 
 
-  // 
+  
   @Router.post("/tags/initialize")
   async initializeTags() {
     await Tagging.initializeTags();
