@@ -39,6 +39,9 @@ export interface RSVPDoc extends BaseDoc {
         return { msg: "RSVP successfully created!", rsvp: await this.rsvps.readOne({ _id }) };
       }
     
+      async getRSVPs() {  
+        return await this.rsvps.readMany({}, { sort: { _id: -1 } });
+      }
 
       async deleteRSVP(user: ObjectId, event: ObjectId, status: boolean) {
         status = false;

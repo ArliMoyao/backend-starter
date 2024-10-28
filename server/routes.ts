@@ -89,6 +89,10 @@ class Routes {
     return await RSVPing.createRSVP(user, event._id, status);
   }
 
+  @Router.get("/rsvps")
+  async getRSVPs() {
+    return RSVPing.rsvps;
+  }
 
  @Router.delete("/rsvps/:eventid")
   async deleteRSVP(session: SessionDoc, eventid: string, status: boolean) {
