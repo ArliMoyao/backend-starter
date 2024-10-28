@@ -89,7 +89,7 @@ export default class TaggingConcept {
        * Get all predefined tags
        */
       async getTags() {
-        return this.predefinedTags;
+        return this.tags.readMany({});
   }
 
     }
