@@ -7,16 +7,7 @@ export interface TagDoc extends BaseDoc {
   id: ObjectId;
   name: string;
 }
-export interface EventDoc extends BaseDoc {
-  host: ObjectId;
-  location: string;
-  eventType: string;
-  capacity: number;
-  moodTag: ObjectId;
-  category: ObjectId;
-  date: Date;
-  status: string;
-}
+
 
 /**
  * Concept: Tagging [Tag, Mood, Event]
@@ -79,10 +70,8 @@ export default class TaggingConcept {
       }
 
       async initializeTags() {
-        const existingTags = await this.tags.readMany({});
-        if (existingTags.length === 0) {
-          await this.tags.createMany(this.predefinedTags);
-        }
+         return{msg: "Collection successfully created", tags: await this.tags.createMany(this.predefinedTags)};
+    
       }
 
       /**
