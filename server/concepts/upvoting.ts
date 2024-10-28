@@ -44,15 +44,18 @@ export default class UpvotingConcept {
         return { msg: "Upvote successfully created!", upvote: await this.upvotes.readOne({ _id }) };
     }
 
-    async incrementUpvoteCount(eventId: ObjectId) {
-      const result = await this.upvotes.partialUpdateOne(
-          { eventId },
-          { $inc: { upVoteCount: 1 } } as Partial<UpvoteDoc>
-      );
-      if (!result) throw new NotFoundError(`Event ${eventId} does not exist for incrementing upvotes.`);
-      return { msg: "Upvote count incremented successfully!" };
-
+   
+  async incrementUpvoteCount(eventId: ObjectId) {
+    const result = await this.upvotes.incrementOne(
+      { eventId },
+      { $inc: { upVoteCount: 1 } }
+    );
+    if (result.matchedCount === 0) {
+      throw new NotFoundError(`Event ${eventId} does not exist for incrementing upvotes.`);
     }
+    return { msg: "Upvote count incremented successfully!" };
+  }
+      
     // async removeUpvote(userId: ObjectId, eventId: ObjectId) { 
     //     const upvote = await this.upvotes.popOne({ userId, eventId });
     //     if (!upvote) {
