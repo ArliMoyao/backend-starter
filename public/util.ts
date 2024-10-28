@@ -113,12 +113,14 @@ const operations: Operation[] = [
       location: "input",
     },
   },
+{
+  name:" Get Mood Tag",
+  endpoint: "/api/tags",
+  method: "GET",
+  fields: {},
+},
 
-
-  { name: "Get Categories", endpoint: "/api/categories", method: "GET", fields: {} },
-  
-  {name: "Get Moods", endpoint: "/api/moods", method: "GET", fields: {}},
-  {
+{
     name: "Delete Event",
     endpoint: "/api/events/:id",
     method: "DELETE",

@@ -55,18 +55,18 @@ class Routes {
   }
 
   //TAGGING CONCEPT(REVISIT WORKING ON)
-  //post the list of predefined categories
-  @Router.get("/categories")
-  async getCategories(req: any, res: any) {
-    const categories: any = await Responses.categories(Tagging);
-    res.json(categories);}
+  // //post the list of predefined categories
+  // @Router.get("/categories")
+  // async getCategories(req: any, res: any) {
+  //   const categories: any = await Responses.categories(Tagging);
+  //   res.json(categories);}
 
 //get list of predefined moods //not work
-  @Router.get("/moods")
-  async getMoods(req: any, res: any) {
-      const moods: any = await Responses.moods(Tagging);
-      res.json(moods);
-  }
+  // @Router.get("/moods")
+  // async getMoods(req: any, res: any) {
+  //     const moods: any = await Responses.moods(Tagging);
+  //     res.json(moods);
+  // }
 
   //RSVPING CONCEPT  
   // //list all RSVPs
@@ -100,6 +100,21 @@ class Routes {
       const oid = new ObjectId(rsvpid);
       return await RSVPing.deleteRSVP(oid);
     }
+
+  // 
+
+  // 
+  @Router.post("/tags/initialize")
+  async initializeTags() {
+    await Tagging.initializeTags();
+    return { msg: "Tags initialized successfully!" };
+  }
+
+  // Get all predefined tags
+  @Router.get("/tags")
+  async getTags() {
+    return await Tagging.getTags();
+  }
 
   //when user rsvp to an event (sync user auth, session, rsvp, event)
   //step 1: authenticate and validate the user

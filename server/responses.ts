@@ -93,14 +93,14 @@ static async posts(posts: PostDoc[]) {
 }
 
 //getting the categories
-static async categories(tagging: TaggingConcept) {
-  const categories = await tagging.setCategories();
-  return categories;
-}
+// static async categories(tagging: TaggingConcept) {
+//   const categories = await tagging.setCategories();
+//   return categories;
+// }
 
 //getting the moods
-static async moods(tagging: TaggingConcept) {
-  const moods = await tagging.setMoods();
-  return moods;
-}
+// static async moods(tagging: TaggingConcept) {
+//   const moods = await tagging.setMoods();
+//   return moods;
+// }
 }
