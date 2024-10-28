@@ -44,10 +44,7 @@ export interface RSVPDoc extends BaseDoc {
       }
 
       async deleteRSVP(rsvpID: ObjectId) {
-        const rsvp = await this.rsvps.readOne({ _id: rsvpID });
-        if (!rsvp) {
-          throw new NotFoundError(`RSVP ${rsvpID} not found`);
-        }
+        const rsvp = await this.rsvps.readOne({_id: rsvpID}); 
         await this.rsvps.deleteOne({ _id: rsvpID });
         return { msg: "RSVP successfully deleted!" };
       }
