@@ -90,7 +90,15 @@ class Routes {
   }
 
 
- 
+ @Router.delete("/rsvps/:eventid")
+  async deleteRSVP(session: SessionDoc, eventid: string) {
+    const user = Sessioning.getUser(session);
+    const event = await Eventing.getEventById(new ObjectId(eventid));
+    if (!event) {
+      throw new Error("Event not found");
+    }
+    return await RSVPing.deleteRSVP(user, event._id);
+  }
 
 
   //when user rsvp to an event (sync user auth, session, rsvp, event)

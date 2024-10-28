@@ -34,16 +34,19 @@ export interface RSVPDoc extends BaseDoc {
 
       async createRSVP(user: ObjectId, event: ObjectId, status: boolean) {
        
-        if (status === false) {
-       
-          status = true;
-        } 
+        status = true;
         const _id = await this.rsvps.createOne({ user, event, status });
         return { msg: "RSVP successfully created!", rsvp: await this.rsvps.readOne({ _id }) };
       }
     
 
-
+      async deleteRSVP(user: ObjectId, event: ObjectId) {
+        const rsvp = await this.rsvps.readOne({ user, event });
+        if (!rsvp) throw new NotFoundError(`RSVP ${user} for event ${event} not found`);
+    
+        await this.rsvps.deleteOne({ _id: rsvp._id });
+        return { msg: "RSVP successfully deleted!" };
+      }
 
       // async rsvpForEvent(user: ObjectId, eventId: ObjectId) {
       //   const event = await this.events.readOne({ _id: eventId });
