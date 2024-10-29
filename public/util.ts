@@ -183,7 +183,7 @@ const operations: Operation[] = [
     name: 'Get Events Hosted By User',
     endpoint: 'api/events/:host',
     method: 'GET',
-    fields: {},
+    fields: {userId: 'input'},
   },
 
  {
@@ -191,7 +191,7 @@ const operations: Operation[] = [
   name: 'Get RSVPs By User',
   endpoint: 'api/rsvps/:userid',
   method: 'GET',
-  fields: {},
+  fields: {userId: 'input'},
 
  }
 ];
