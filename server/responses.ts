@@ -3,8 +3,8 @@ import { Authing } from "./app";
 import { Router } from "./framework/router";
 import { PostAuthorNotMatchError, PostDoc } from "./concepts/posting";
 import { EventDoc } from "./concepts/events";
-import { TagDoc } from "./concepts/tagging";
-import TaggingConcept from "./concepts/tagging";
+//import { TagDoc } from "./concepts/moodSyncing";
+//import TaggingConcept from "./concepts/moodSyncing";
 /**
  * This class does useful conversions for the frontend.
  * For example, it converts a {@link PostDoc} into a more readable format for the frontend.

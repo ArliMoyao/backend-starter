@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Authing, Eventing, Posting, RSVPing, Sessioning, Streaks, Tagging, Upvoting } from "./app";
+import { Authing, Eventing, Posting, RSVPing, Sessioning, Upvoting, MoodSyncing, Notifying } from "./app";
 //import { PostOptions } from "./concepts/posting";
 import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
@@ -20,6 +20,7 @@ class Routes {
   async create(session: SessionDoc, title: string, description: string, category: ObjectId, moodTag: ObjectId, capacity: number,  location: string, date: Date) {
     const user = Sessioning.getUser(session);
     const create = await Eventing.create(user, title, description, category, moodTag, capacity, location, date);
+    await Notifying.createNotification(user, `You have created event ${title}`);
     return { msg: create.msg, event: await Responses.event(create.event) };
   }
 
@@ -37,6 +38,7 @@ class Routes {
     const user = Sessioning.getUser(session);
     const oid = new ObjectId(id);
     await Eventing.assertHostIsUser(oid, user);
+    await Notifying.createNotification(user, `You have updated event ${id}`); 
     return await Eventing.update(new ObjectId(id), { description, location, capacity });
   }
 
@@ -76,12 +78,13 @@ class Routes {
     
   // }
 
-// RSVP to an event
+// RSVPING CONCEPT
   @Router.post("/rsvps/:eventid")
   async createRSVP(session: SessionDoc, eventid: string, status: boolean) {
     const user = Sessioning.getUser(session);
     const event = await Eventing.getEventById(new ObjectId(eventid));
-    
+    await Notifying.createNotification(user, `You have RSVP'd to event ${eventid}`);
+
     if (!event) {
       throw new Error("Event not found");
     }
@@ -98,20 +101,21 @@ class Routes {
   async deleteRSVP(session: SessionDoc, rsvpid: string) {
       const user = Sessioning.getUser(session);
       const oid = new ObjectId(rsvpid);
+      await Notifying.createNotification(user, `You have cancelled your RSVP to event ${rsvpid}`);
       return await RSVPing.deleteRSVP(oid);
     }
 
-  @Router.post("/tags/initialize")
-  async initializeTags() {
-    await Tagging.initializeTags();
-    return { msg: "Tags initialized successfully!" };
-  }
+  // @Router.post("/tags/initialize")
+  // async initializeTags() {
+  //   await Tagging.initializeTags();
+  //   return { msg: "Tags initialized successfully!" };
+  // }
 
-  // Get all predefined tags
-  @Router.get("/tags")
-  async getTags() {
-    return await Tagging.getTags();
-  }
+  // // Get all predefined tags
+  // @Router.get("/tags")
+  // async getTags() {
+  //   return await Tagging.getTags();
+  // }
 
   //UPVOTING CONCEPT 
   @Router.get("/upvotes")
@@ -124,6 +128,7 @@ class Routes {
     const user = Sessioning.getUser(session);
     const eventId = new ObjectId(eventid);
     await Upvoting.createUpvote(user, eventId , 1);
+    await Notifying.createNotification(user, `You have upvoted event ${eventid}`);
     return { msg: "Upvote successfully created!" };
   }
 
@@ -131,7 +136,30 @@ class Routes {
   async removeUpvote(session: SessionDoc, eventid: string) {
     const user = Sessioning.getUser(session);
     const eventId = new ObjectId(eventid);
+    await Notifying.createNotification(user, `You have removed your upvote from event ${eventId}`);
     return await Upvoting.deleteUpvote(eventId);
+  }
+
+  // Create a notification
+  @Router.post("/notifications")
+  async createNotification(session: SessionDoc, message: string) {
+    const user = Sessioning.getUser(session);
+    return await Notifying.createNotification(user, message);
+  }
+
+  // Get notifications for a user
+  @Router.get("/notifications")
+  async getNotifications(session: SessionDoc) {
+    const user = Sessioning.getUser(session);
+    return await Notifying.getNotifications(user);
+  }
+
+
+  // Delete a notification
+  @Router.delete("/notifications/:id")
+  async deleteNotification(session: SessionDoc, id: string) {
+    const notificationId = new ObjectId(id);
+    return await Notifying.deleteNotification(notificationId);
   }
 
 
@@ -207,45 +235,45 @@ class Routes {
   //streaks concept
 
   //get user's streak details
-  @Router.get("/streaks/:userid")
-  async getStreaks() {
-    return Streaks.streaks;
-  }
+  // @Router.get("/streaks/:userid")
+  // async getStreaks() {
+  //   return Streaks.streaks;
+  // }
 
-  //increment a user's streak
-  @Router.patch("/streaks/increment")
-  async incrementStreak(session: SessionDoc) {
-    const user = Sessioning.getUser(session);
-    return await Streaks.attendEvent(user, new Date());
-  }
+  // //increment a user's streak
+  // @Router.patch("/streaks/increment")
+  // async incrementStreak(session: SessionDoc) {
+  //   const user = Sessioning.getUser(session);
+  //   return await Streaks.attendEvent(user, new Date());
+  // }
 
-  //mark attendance, increments user streak
-  @Router.patch("/events/:eventid/attendance")
-  async markAttendance(session: SessionDoc, eventId: string, userId: string, attended: boolean) {
-    Sessioning.getUser(session);
-    const streak = await Streaks.getStreak(new ObjectId(userId));
+  // //mark attendance, increments user streak
+  // @Router.patch("/events/:eventid/attendance")
+  // async markAttendance(session: SessionDoc, eventId: string, userId: string, attended: boolean) {
+  //   Sessioning.getUser(session);
+  //   const streak = await Streaks.getStreak(new ObjectId(userId));
 
-    if (attended) {
-      const eventDate = new Date();
-      const result = await Streaks.attendEvent(new ObjectId(userId), eventDate);
+  //   if (attended) {
+  //     const eventDate = new Date();
+  //     const result = await Streaks.attendEvent(new ObjectId(userId), eventDate);
 
-      if (!result) {
-        console.error("Error incrementing streak");
-      }
-      //await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
+  //     if (!result) {
+  //       console.error("Error incrementing streak");
+  //     }
+  //     //await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
 
-      return { msg: streak };
-    } else {
-      //reset users streak
-      const resetResult = await Streaks.missedEvent(new ObjectId(userId));
+  //     return { msg: streak };
+  //   } else {
+  //     //reset users streak
+  //     const resetResult = await Streaks.missedEvent(new ObjectId(userId));
 
-      if (!resetResult) {
-        console.error("error resetting streak");
-      }
-      //await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
-      return { msg: streak };
-    }
-  }
+  //     if (!resetResult) {
+  //       console.error("error resetting streak");
+  //     }
+  //     //await Posting.createActionPost(new ObjectId(userId), new ObjectId(eventId), "streak");
+  //     return { msg: streak };
+  //   }
+  // }
 
   //upvoting concept
 

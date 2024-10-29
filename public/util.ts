@@ -154,12 +154,6 @@ const operations: Operation[] = [
     fields: {},
   },
   {
-    name: "Get Specific RSVP Details",
-    endpoint: "/api/rsvps/:id",
-    method: "GET",
-    fields: { id: "input" },
-  },
-  {
     name: "Get Streaks",
     endpoint: "/api/streaks/:userid",
     method: "GET",
@@ -193,44 +187,9 @@ const operations: Operation[] = [
     name: "Remove Upvote from Event",
     endpoint: "/api/upvotes/:upvoteid",
     method: "DELETE",
-    fields: { eventid: "input" },
+    fields: { rsvpid: "input" },
   },
-  {
-    name: "Tag Event",
-    endpoint: "/api/events/:eventId/tags",
-    method: "POST",
-    fields: { eventId: "input", tag: "input" },
-  },
-  {
-    name: "Remove Tag from Event",
-    endpoint: "/api/events/:eventId/tags",
-    method: "DELETE",
-    fields: { eventId: "input", tagId: "input" },
-  },
-  {
-    name: "Set Mood for User",
-    endpoint: "/api/users/mood",
-    method: "POST",
-    fields: { moodId: "input" },
-  },
-  {
-    name: "Get Available Moods",
-    endpoint: "/api/mood",
-    method: "GET",
-    fields: {},
-  },
-  {
-    name: "Get Events by Mood",
-    endpoint: "/api/users/events-by-mood",
-    method: "GET",
-    fields: {},
-  },
-  {
-    name: "Get Events by Category",
-    endpoint: "/api/events/by-category",
-    method: "GET",
-    fields: { tagId: "input" },
-  },
+ 
 ];
 
 /*
