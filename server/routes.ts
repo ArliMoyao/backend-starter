@@ -52,12 +52,17 @@ class Routes {
     return await Eventing.getEventById(new ObjectId(id));
   }
 
-  @Router.get("/events/hosted-by/:username")
-  async getEventsHostedByUser(username: string) {
-    const user = await Authing.getUserByUsername(username);
-    return await Eventing.getEventsHostedByUser(user._id);
-    
+
+  @Router.get("/events/:host")
+  async getEventsByUser(userId: string) {
+    return await Eventing.getEventsHostedByUser(new ObjectId(userId));
   }
+
+  @Router.get("/rsvps/:userid")
+  async getRSVPByUser(userId: string) {
+    return await RSVPing.getRSVPByUser(new ObjectId(userId));
+  }
+
 
 
   //TAGGING CONCEPT(REVISIT WORKING ON)

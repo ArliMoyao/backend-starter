@@ -54,6 +54,13 @@ export interface RSVPDoc extends BaseDoc {
           throw new NotAllowedError("You are not the host of this event.");
         }
       }
+
+
+      async getRSVPByUser(host: ObjectId) {
+        return await this.rsvps.readMany({ host });
+      }}
+      
+
       // async rsvpForEvent(user: ObjectId, eventId: ObjectId) {
       //   const event = await this.events.readOne({ _id: eventId });
       //   if (!event) throw new NotFoundError(`Event ${eventId} not found`);
@@ -71,7 +78,7 @@ export interface RSVPDoc extends BaseDoc {
       //   await this.rsvps.createOne({ user, event: eventId, status: true });
       //   return { msg: "RSVP successfully created!" };
       // }
-    }
+    
     // //Action: RSVP to an event
     // async rsvpForEvent(user: ObjectId, eventId: ObjectId) {
     //     //find an event
