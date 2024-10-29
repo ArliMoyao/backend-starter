@@ -1,22 +1,22 @@
-import { ObjectId, Collection } from "mongodb";
+import { ObjectId } from "mongodb";
+import DocCollection, { BaseDoc } from "../framework/doc";
 
-// Define or import the CategoryDoc type
-type CategoryDoc = {
+export interface CategoryDoc extends BaseDoc {
   id: ObjectId;
   name: string;
-};
+}
 
 export default class moodSyncing {
   public readonly predefinedMoods: { id: ObjectId; name: string }[];
   public readonly predefinedCategories: { id: ObjectId; name: string }[];
-  private categoriesCollection: Collection<CategoryDoc>;
+  public readonly categories: DocCollection<CategoryDoc>;
 
   /**
    * Make an instance of moodSyncing.
    */
 
-  constructor(collectionName: string) {
-    this.categoriesCollection = new Collection<CategoryDoc>();
+  constructor(CollectionName: string) {
+    this.categories = new DocCollection<CategoryDoc>(CollectionName);
     this.predefinedCategories = [
       { id: new ObjectId(), name: "Music & Concerts" },
       { id: new ObjectId(), name: "Fitness & Wellness" },
@@ -54,11 +54,11 @@ export default class moodSyncing {
   }
 
   async insertCategories() {
-    const existingCategories = await this.categoriesCollection.find().toArray();
-    if (existingCategories.length === 0) {
-      await this.categoriesCollection.insertMany(this.predefinedCategories);
-    
-      return { msg: "Categories inserted successfully!" };
+    const existingCategories = await this.categories.readMany({});
+    if (existingCategories.length > 0) {
+      return { msg: "Categories already exist!" };
+    }
+    await this.categories.createMany(this.predefinedCategories);
+    return { msg: "Categories successfully inserted!" };
   }
-}
 }

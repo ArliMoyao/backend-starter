@@ -1,9 +1,8 @@
 import { ObjectId } from "mongodb";
 
-import { z } from "zod";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Authing, Eventing, RSVPing, Sessioning, Upvoting, MoodSyncing, Notifying } from "./app";
+import { Authing, Eventing, MoodSyncing, Notifying, RSVPing, Sessioning, Upvoting } from "./app";
 //import { PostOptions } from "./concepts/posting";
 //import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
@@ -13,32 +12,29 @@ import Responses from "./responses";
  * Web server routes for the app. Implements synchronizations between concepts.
  */
 class Routes {
-
-
-  //EVENTING CONCEPT 
+  //EVENTING CONCEPT
   @Router.post("/events")
-  async create(session: SessionDoc, title: string, description: string, category: ObjectId, moodTag: ObjectId, capacity: number,  location: string, date: Date) {
+  async create(session: SessionDoc, title: string, description: string, category: ObjectId, moodTag: ObjectId, capacity: number, location: string, date: Date) {
     const user = Sessioning.getUser(session);
     const create = await Eventing.create(user, title, description, category, moodTag, capacity, location, date);
     await Notifying.createNotification(user, `You have created event ${title}`);
     return { msg: create.msg, event: await Responses.event(create.event) };
   }
 
-
-  //get all events 
+  //get all events
   @Router.get("/events")
-  async getEvent(id: string) {
+  async getEvent() {
     return Eventing.getEvents();
   }
 
   //edit event details of a specific event
   //can only edit description, 1ocation, capacity
   @Router.patch("/events/:id")
-  async updateEvent(session: SessionDoc, id: string, description?:string, location?: string, capacity?: number) {
+  async updateEvent(session: SessionDoc, id: string, description?: string, location?: string, capacity?: number) {
     const user = Sessioning.getUser(session);
     const oid = new ObjectId(id);
     await Eventing.assertHostIsUser(oid, user);
-    await Notifying.createNotification(user, `You have updated event ${id}`); 
+    await Notifying.createNotification(user, `You have updated event ${id}`);
     return await Eventing.update(new ObjectId(id), { description, location, capacity });
   }
 
@@ -63,22 +59,22 @@ class Routes {
   //   const categories: any = await Responses.categories(Tagging);
   //   res.json(categories);}
 
-//get list of predefined moods //not work
+  //get list of predefined moods //not work
   // @Router.get("/moods")
   // async getMoods(req: any, res: any) {
   //     const moods: any = await Responses.moods(Tagging);
   //     res.json(moods);
   // }
 
-  //RSVPING CONCEPT  
+  //RSVPING CONCEPT
   // //list all RSVPs
   // @Router.get("/rsvps/:userRSVPid")
   // async getRSVPsforUser() {
   //   return RSVPing.rsvps;
-    
+
   // }
 
-// RSVPING CONCEPT
+  // RSVPING CONCEPT
   @Router.post("/rsvps/:eventid")
   async createRSVP(session: SessionDoc, eventid: string, status: boolean) {
     const user = Sessioning.getUser(session);
@@ -88,7 +84,7 @@ class Routes {
     if (!event) {
       throw new Error("Event not found");
     }
-  
+
     return await RSVPing.createRSVP(user, event._id, status);
   }
 
@@ -97,13 +93,13 @@ class Routes {
     return RSVPing.getRSVPS();
   }
 
- @Router.delete("/rsvps/:rsvpid")
+  @Router.delete("/rsvps/:rsvpid")
   async deleteRSVP(session: SessionDoc, rsvpid: string) {
-      const user = Sessioning.getUser(session);
-      const oid = new ObjectId(rsvpid);
-      await Notifying.createNotification(user, `You have cancelled your RSVP to event ${rsvpid}`);
-      return await RSVPing.deleteRSVP(oid);
-    }
+    const user = Sessioning.getUser(session);
+    const oid = new ObjectId(rsvpid);
+    await Notifying.createNotification(user, `You have cancelled your RSVP to event ${rsvpid}`);
+    return await RSVPing.deleteRSVP(oid);
+  }
 
   // @Router.post("/tags/initialize")
   // async initializeTags() {
@@ -117,7 +113,7 @@ class Routes {
   //   return await Tagging.getTags();
   // }
 
-  //UPVOTING CONCEPT 
+  //UPVOTING CONCEPT
   @Router.get("/upvotes")
   async getUpvotes() {
     return Upvoting.upvotes;
@@ -127,7 +123,7 @@ class Routes {
   async upvote(session: SessionDoc, eventid: string) {
     const user = Sessioning.getUser(session);
     const eventId = new ObjectId(eventid);
-    await Upvoting.createUpvote(user, eventId , 1);
+    await Upvoting.createUpvote(user, eventId, 1);
     await Notifying.createNotification(user, `You have upvoted event ${eventid}`);
     return { msg: "Upvote successfully created!" };
   }
@@ -154,7 +150,6 @@ class Routes {
     return await Notifying.getNotifications(user);
   }
 
-
   // Delete a notification
   @Router.delete("/notifications/:id")
   async deleteNotification(session: SessionDoc, id: string) {
@@ -162,10 +157,8 @@ class Routes {
     return await Notifying.deleteNotification(notificationId);
   }
 
-
   @Router.post("/categories")
-  async createMood(session: SessionDoc, mood: string) {
-    const user = Sessioning.getUser(session);
+  async createMood() {
     return await MoodSyncing.insertCategories();
   }
   //   // Remove an upvote from an event
@@ -176,8 +169,7 @@ class Routes {
   //     return await Upvoting.removeUpvote(user, eventId);
   //   }
 
-
-  // //increment an upvote for a given event 
+  // //increment an upvote for a given event
   // @Router.patch("/upvotes/:eventid")
   // async incrementUpvote(session: SessionDoc, eventid: string) {
   //   const user = Sessioning.getUser(session);
@@ -236,7 +228,6 @@ class Routes {
   //   return { msg: rsvp.msg };
   // }
 
- 
   //streaks concept
 
   //get user's streak details
@@ -522,42 +513,40 @@ class Routes {
   //   return await Friending.rejectRequest(fromOid, user);
   // }
 
-//   @Router.get("/posts")
-//   @Router.validate(z.object({ author: z.string().optional() }))
-//   async getPosts(author?: string) {
-//     let posts;
-//     if (author) {
-//       const id = (await Authing.getUserByUsername(author))._id;
-//       posts = await Posting.getByAuthor(id);
-//     } else {
-//       posts = await Posting.getPosts();
-//     }
-//     return Responses.posts(posts);
-//   }
+  //   @Router.get("/posts")
+  //   @Router.validate(z.object({ author: z.string().optional() }))
+  //   async getPosts(author?: string) {
+  //     let posts;
+  //     if (author) {
+  //       const id = (await Authing.getUserByUsername(author))._id;
+  //       posts = await Posting.getByAuthor(id);
+  //     } else {
+  //       posts = await Posting.getPosts();
+  //     }
+  //     return Responses.posts(posts);
+  //   }
 
-//   @Router.post("/posts")
-//   async createPost(session: SessionDoc, content: string, options?: PostOptions) {
-//     const user = Sessioning.getUser(session);
-//     const created = await Posting.create(user, content, options);
-//     return { msg: created.msg, post: await Responses.post(created.post) };
-//   }
+  //   @Router.post("/posts")
+  //   async createPost(session: SessionDoc, content: string, options?: PostOptions) {
+  //     const user = Sessioning.getUser(session);
+  //     const created = await Posting.create(user, content, options);
+  //     return { msg: created.msg, post: await Responses.post(created.post) };
+  //   }
 
-
-//   @Router.patch("/posts/:id")
-//   async updatePost(session: SessionDoc, id: string, content?: string, options?: PostOptions) {
-//     const user = Sessioning.getUser(session);
-//     const oid = new ObjectId(id);
-//     await Posting.assertAuthorIsUser(oid, user);
-//     return await Posting.update(oid, content, options);
-//   }
-//  @Router.delete("/posts/:id")
-//   async deletePost(session: SessionDoc, id: string) {
-//     const user = Sessioning.getUser(session);
-//     const oid = new ObjectId(id);
-//     await Posting.assertAuthorIsUser(oid, user);
-//     return Posting.delete(oid);
-//   }
-  
+  //   @Router.patch("/posts/:id")
+  //   async updatePost(session: SessionDoc, id: string, content?: string, options?: PostOptions) {
+  //     const user = Sessioning.getUser(session);
+  //     const oid = new ObjectId(id);
+  //     await Posting.assertAuthorIsUser(oid, user);
+  //     return await Posting.update(oid, content, options);
+  //   }
+  //  @Router.delete("/posts/:id")
+  //   async deletePost(session: SessionDoc, id: string) {
+  //     const user = Sessioning.getUser(session);
+  //     const oid = new ObjectId(id);
+  //     await Posting.assertAuthorIsUser(oid, user);
+  //     return Posting.delete(oid);
+  //   }
 }
 
 /** The web app. */

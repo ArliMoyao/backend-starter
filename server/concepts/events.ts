@@ -40,7 +40,7 @@ export default class EventsConcept {
       location,
       date,
       status: "upcoming",
-      attendees: []
+      attendees: [],
     });
     return { msg: "Event successfully created!", event: await this.events.readOne({ _id }) };
   }
