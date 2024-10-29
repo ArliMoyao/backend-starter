@@ -177,8 +177,14 @@ const operations: Operation[] = [
     endpoint: '/api/categories',
     method: 'POST',
     fields: {},
+  },
+
+  { 
+    name: 'Get Events Hosted By User',
+    endpoint: 'api/events/hosted-by/:username',
+    method: 'GET',
+    fields: {},
   }
-  
 
  
 ];

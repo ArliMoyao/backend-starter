@@ -52,6 +52,12 @@ class Routes {
     return await Eventing.getEventById(new ObjectId(id));
   }
 
+  @Router.get("/events/hosted-by/:username")
+  async getEventsHostedByUser(username: string) {
+    const user = await Authing.getUserByUsername(username);
+    return await Eventing.getEventsHostedByUser(user._id);
+  }
+
   //TAGGING CONCEPT(REVISIT WORKING ON)
   // //post the list of predefined categories
   // @Router.get("/categories")
@@ -161,6 +167,7 @@ class Routes {
   async createMood() {
     return await MoodSyncing.insertCategories();
   }
+
   //   // Remove an upvote from an event
   //   @Router.delete("/upvotes/:eventid")
   //   async removeUpvote(session: SessionDoc, eventid: string) {

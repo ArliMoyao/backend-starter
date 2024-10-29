@@ -73,6 +73,10 @@ export default class EventsConcept {
     }
   }
 
+  async getEventsHostedByUser(user: ObjectId) {
+    return await this.events.readMany({ host: user });
+  }
+
   async getEventById(_id: ObjectId) {
     return await this.events.readOne({ _id });
   }
