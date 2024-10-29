@@ -56,7 +56,9 @@ class Routes {
   async getEventsHostedByUser(username: string) {
     const user = await Authing.getUserByUsername(username);
     return await Eventing.getEventsHostedByUser(user._id);
+    
   }
+
 
   //TAGGING CONCEPT(REVISIT WORKING ON)
   // //post the list of predefined categories
