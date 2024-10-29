@@ -154,24 +154,6 @@ const operations: Operation[] = [
     fields: {},
   },
   {
-    name: "Get Streaks",
-    endpoint: "/api/streaks/:userid",
-    method: "GET",
-    fields: { userid: "input" },
-  },
-  {
-    name: "Increment Streak",
-    endpoint: "/api/streaks/increment",
-    method: "PATCH",
-    fields: {},
-  },
-  // {
-  //   name: "Mark Attendance",
-  //   endpoint: "/api/events/:eventid/attendance",
-  //   method: "PATCH",
-  //   fields: { eventid: "input", userId: "input", attendence: "boolean" },
-  // },
-  {
     name: "Get Upvotes for Event",
     endpoint: "/api/upvotes/:eventid",
     method: "GET",
@@ -189,6 +171,15 @@ const operations: Operation[] = [
     method: "DELETE",
     fields: { rsvpid: "input" },
   },
+
+  {
+    name: 'Insert Category',
+    endpoint: '/api/categories',
+    method: 'POST',
+    fields: {},
+  }
+  
+
  
 ];
 

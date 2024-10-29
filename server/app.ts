@@ -7,7 +7,7 @@ import RSVPConcept from "./concepts/rsvp'ing";
 //import StreakConcept from "./concepts/streaks";
 //import TaggingConcept from "./concepts/tagging";
 import UpvotingConcept from "./concepts/upvoting";
-import PostingConcept from "./concepts/posting";
+//import PostingConcept from "./concepts/posting";
 import MoodSyncingConcept from "./concepts/moodSyncing";
 import NotifyingConcept from "./concepts/notifying";
 
@@ -21,9 +21,9 @@ export const Authing = new AuthenticatingConcept("users");
 export const Eventing = new EventConcept("events");
 export const RSVPing = new RSVPConcept("rsvps");
 //export const Streaks = new StreakConcept("streaks");
-export const MoodSyncing = new MoodSyncingConcept( "tags", "moods");
+export const MoodSyncing = new MoodSyncingConcept( "tags");
 export const Upvoting = new UpvotingConcept("upvotes");
-export const Posting = new PostingConcept("posts");
+//export const Posting = new PostingConcept("posts");
 export const Notifying = new NotifyingConcept("notifications");
 
 //export const Friending = new FriendingConcept("friends");

@@ -3,9 +3,9 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Authing, Eventing, Posting, RSVPing, Sessioning, Upvoting, MoodSyncing, Notifying } from "./app";
+import { Authing, Eventing, RSVPing, Sessioning, Upvoting, MoodSyncing, Notifying } from "./app";
 //import { PostOptions } from "./concepts/posting";
-import { PostOptions } from "./concepts/posting";
+//import { PostOptions } from "./concepts/posting";
 import { SessionDoc } from "./concepts/sessioning";
 import Responses from "./responses";
 
@@ -163,6 +163,11 @@ class Routes {
   }
 
 
+  @Router.post("/categories")
+  async createMood(session: SessionDoc, mood: string) {
+    const user = Sessioning.getUser(session);
+    return await MoodSyncing.insertCategories();
+  }
   //   // Remove an upvote from an event
   //   @Router.delete("/upvotes/:eventid")
   //   async removeUpvote(session: SessionDoc, eventid: string) {
@@ -517,41 +522,41 @@ class Routes {
   //   return await Friending.rejectRequest(fromOid, user);
   // }
 
-  @Router.get("/posts")
-  @Router.validate(z.object({ author: z.string().optional() }))
-  async getPosts(author?: string) {
-    let posts;
-    if (author) {
-      const id = (await Authing.getUserByUsername(author))._id;
-      posts = await Posting.getByAuthor(id);
-    } else {
-      posts = await Posting.getPosts();
-    }
-    return Responses.posts(posts);
-  }
+//   @Router.get("/posts")
+//   @Router.validate(z.object({ author: z.string().optional() }))
+//   async getPosts(author?: string) {
+//     let posts;
+//     if (author) {
+//       const id = (await Authing.getUserByUsername(author))._id;
+//       posts = await Posting.getByAuthor(id);
+//     } else {
+//       posts = await Posting.getPosts();
+//     }
+//     return Responses.posts(posts);
+//   }
 
-  @Router.post("/posts")
-  async createPost(session: SessionDoc, content: string, options?: PostOptions) {
-    const user = Sessioning.getUser(session);
-    const created = await Posting.create(user, content, options);
-    return { msg: created.msg, post: await Responses.post(created.post) };
-  }
+//   @Router.post("/posts")
+//   async createPost(session: SessionDoc, content: string, options?: PostOptions) {
+//     const user = Sessioning.getUser(session);
+//     const created = await Posting.create(user, content, options);
+//     return { msg: created.msg, post: await Responses.post(created.post) };
+//   }
 
 
-  @Router.patch("/posts/:id")
-  async updatePost(session: SessionDoc, id: string, content?: string, options?: PostOptions) {
-    const user = Sessioning.getUser(session);
-    const oid = new ObjectId(id);
-    await Posting.assertAuthorIsUser(oid, user);
-    return await Posting.update(oid, content, options);
-  }
- @Router.delete("/posts/:id")
-  async deletePost(session: SessionDoc, id: string) {
-    const user = Sessioning.getUser(session);
-    const oid = new ObjectId(id);
-    await Posting.assertAuthorIsUser(oid, user);
-    return Posting.delete(oid);
-  }
+//   @Router.patch("/posts/:id")
+//   async updatePost(session: SessionDoc, id: string, content?: string, options?: PostOptions) {
+//     const user = Sessioning.getUser(session);
+//     const oid = new ObjectId(id);
+//     await Posting.assertAuthorIsUser(oid, user);
+//     return await Posting.update(oid, content, options);
+//   }
+//  @Router.delete("/posts/:id")
+//   async deletePost(session: SessionDoc, id: string) {
+//     const user = Sessioning.getUser(session);
+//     const oid = new ObjectId(id);
+//     await Posting.assertAuthorIsUser(oid, user);
+//     return Posting.delete(oid);
+//   }
   
 }
 

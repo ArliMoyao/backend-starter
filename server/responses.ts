@@ -1,7 +1,7 @@
 import { Authing } from "./app";
 //import { PostAuthorNotMatchError, PostDoc } from "./concepts/posting";
 import { Router } from "./framework/router";
-import { PostAuthorNotMatchError, PostDoc } from "./concepts/posting";
+//import { PostAuthorNotMatchError, PostDoc } from "./concepts/posting";
 import { EventDoc } from "./concepts/events";
 //import { TagDoc } from "./concepts/moodSyncing";
 //import TaggingConcept from "./concepts/moodSyncing";
@@ -67,13 +67,13 @@ export default class Responses {
 // })
 //
 
-static async post(post: PostDoc | null) {
-  if (!post) {
-    return post;
-  }
-  const author = await Authing.getUserById(post.author);
-  return { ...post, author: author.username };
-}
+// static async post(post: PostDoc | null) {
+//   if (!post) {
+//     return post;
+//   }
+//   const author = await Authing.getUserById(post.author);
+//   return { ...post, author: author.username };
+// }
 
 
 static async event(event: EventDoc | null) {
@@ -87,10 +87,10 @@ static async event(event: EventDoc | null) {
 /**
  * Same as {@link post} but for an array of PostDoc for improved performance.
  */
-static async posts(posts: PostDoc[]) {
-  const authors = await Authing.idsToUsernames(posts.map((post) => post.author));
-  return posts.map((post, i) => ({ ...post, author: authors[i] }));
-}
+// static async posts(posts: PostDoc[]) {
+//   const authors = await Authing.idsToUsernames(posts.map((post) => post.author));
+//   return posts.map((post, i) => ({ ...post, author: authors[i] }));
+// }
 
 //getting the categories
 // static async categories(tagging: TaggingConcept) {
